@@ -1,28 +1,24 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degree;
-import static edu.wpi.first.units.Units.Rotation;
-
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.kinematics.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.*;
+import frc.robot.Constants.AimbotConstants;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.SwerveSubsystem.RotationStyle;
 
 public class DriveCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
@@ -87,7 +83,7 @@ public class DriveCommand extends Command {
         double zSpeed = -DeadBand(xbox.getRightX(), 0.15);
         double xSpeed = -xySpeed.getX(); // xbox.getLeftX();
         double ySpeed = xySpeed.getY(); // xbox.getLeftY();
-        
+
         // System.out.println("DRIVE!!");
 
         // double mag_xy = Math.sqrt(xSpeed*xSpeed + ySpeed*ySpeed);
@@ -98,7 +94,7 @@ public class DriveCommand extends Command {
 
         xSpeed *= DriveConstants.XY_SPEED_LIMIT * DriveConstants.MAX_ROBOT_VELOCITY;
         ySpeed *= DriveConstants.XY_SPEED_LIMIT * DriveConstants.MAX_ROBOT_VELOCITY;
-        zSpeed *= DriveConstants.Z_SPEED_LIMIT  * DriveConstants.MAX_ROBOT_RAD_VELOCITY;
+        zSpeed *= DriveConstants.Z_SPEED_LIMIT * DriveConstants.MAX_ROBOT_RAD_VELOCITY;
 
         // double dmult = dsratelimiter.calculate(xbox.getRightBumper() ? 1.0 :
         // SLOWMODE_MULT);
@@ -137,38 +133,39 @@ public class DriveCommand extends Command {
                                         .getRadians()));
                 break;
             case Home:
-                
+
                 if (result.hasTargets()) {
-                    double yaw = getResultYaw(result);           
+                    double yaw = getResultYaw(result);
                     double skew = getSkew(result);
                     double deltaX;
-                             
+
                     // SmartDashboard.putNumber("Target Yaw", yaw);
 
                     double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
                     zSpeed = -deltaYaw;
-                    // xSpeed = xbox.getLeftY() * (Math.sin(Math.toRadians(-deltaYaw)) - AimbotConstants.skewController.calculate(skew, 180));
+                    // xSpeed = xbox.getLeftY() * (Math.sin(Math.toRadians(-deltaYaw)) -
+                    // AimbotConstants.skewController.calculate(skew, 180));
 
                     xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw));
                     ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw));
-                
+
                     SmartDashboard.putNumber("Xspeed", xSpeed);
                     SmartDashboard.putNumber("Yspeed", ySpeed);
                 }
                 speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
 
                 // if (result.hasTargets()) {
-                //     double yaw = getResultYaw(result);                    
-                //     SmartDashboard.putNumber("Target Yaw", yaw);
+                // double yaw = getResultYaw(result);
+                // SmartDashboard.putNumber("Target Yaw", yaw);
 
-                //     double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
-                //     zSpeed = -deltaYaw;
+                // double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
+                // zSpeed = -deltaYaw;
 
-                //     xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw));
-                //     ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw));
-                   
-                //     SmartDashboard.putNumber("Xspeed", xSpeed);
-                //     SmartDashboard.putNumber("Yspeed", ySpeed);
+                // xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw));
+                // ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw));
+
+                // SmartDashboard.putNumber("Xspeed", xSpeed);
+                // SmartDashboard.putNumber("Yspeed", ySpeed);
                 // }
                 // speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
 
@@ -178,16 +175,17 @@ public class DriveCommand extends Command {
                 if (result.hasTargets()) {
                     double distance = result.getBestTarget().getBestCameraToTarget().getMeasureX().baseUnitMagnitude();
                     double xOffset = Units.inchesToMeters(6.5);
-                    double angleOffset = Math.atan(xOffset/distance);
+                    double angleOffset = Math.atan(xOffset / distance);
 
                     double yaw = getResultYaw(result);
                     SmartDashboard.putNumber("Target Yaw", yaw);
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw - Units.radiansToDegrees(angleOffset), 0);
+                    double deltaYaw = AimbotConstants.pidController.calculate(yaw - Units.radiansToDegrees(angleOffset),
+                            0);
                     zSpeed = -deltaYaw;
 
                     xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw) + angleOffset);
                     ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw) + angleOffset);
-                
+
                     SmartDashboard.putNumber("Xspeed", xSpeed);
                     SmartDashboard.putNumber("Yspeed", ySpeed);
                 } else {
@@ -204,16 +202,17 @@ public class DriveCommand extends Command {
                 if (result.hasTargets()) {
                     double distance = result.getBestTarget().getBestCameraToTarget().getMeasureX().baseUnitMagnitude();
                     double xOffset = Units.inchesToMeters(6.5);
-                    double angleOffset = Math.atan(xOffset/distance);
+                    double angleOffset = Math.atan(xOffset / distance);
 
                     double yaw = getResultYaw(result);
                     SmartDashboard.putNumber("Target Yaw", yaw);
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw + Units.radiansToDegrees(angleOffset), 0);
+                    double deltaYaw = AimbotConstants.pidController.calculate(yaw + Units.radiansToDegrees(angleOffset),
+                            0);
                     zSpeed = -deltaYaw;
 
                     xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw) - angleOffset);
                     ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw) - angleOffset);
-                
+
                     SmartDashboard.putNumber("Xspeed", xSpeed);
                     SmartDashboard.putNumber("Yspeed", ySpeed);
                 } else {
@@ -259,7 +258,7 @@ public class DriveCommand extends Command {
     private double getSkew(PhotonPipelineResult result) {
         return Units.radiansToDegrees(result.getBestTarget().getBestCameraToTarget().getRotation().getZ());
     }
-    
+
     private double getResultYaw(PhotonPipelineResult result) {
         return result.getBestTarget().getYaw();
     }
