@@ -17,7 +17,7 @@ public class VisionCamera {
     }
 
     public boolean isEnabled() {
-        return isEnabled();
+        return enabled;
     }
 
     public PhotonCamera getPhotonCamera() {

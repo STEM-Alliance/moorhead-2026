@@ -9,6 +9,8 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -247,7 +249,7 @@ public final class Constants {
   }
 
   public static final class PoseConstants {
-
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
     public static final double kPositionStdDevX = 0.1;
     public static final double kPositionStdDevY = 0.1;
     public static final double kPositionStdDevTheta = 10;

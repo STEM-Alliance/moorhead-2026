@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.List;
 
+import org.photonvision.PhotonCamera;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -44,6 +46,7 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.util.PhotonCameraContainer;
 import frc.robot.Robot;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -106,6 +109,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     boolean isalliancereset = false;
 
+    private PhotonCamera photonCamera;
+
     // TODO: Properly set starting pose
     public final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(DriveConstants.KINEMATICS,
             getRotation2d(),
@@ -118,7 +123,8 @@ public class SwerveSubsystem extends SubsystemBase {
                     PoseConstants.kVisionStdDevY,
                     PoseConstants.kVisionStdDevTheta));
 
-    public SwerveSubsystem() {
+    public SwerveSubsystem(PhotonCamera mPhotonCamera) {
+        photonCamera = mPhotonCamera;
         // ! F
         // zeroHeading()
 
@@ -167,30 +173,13 @@ public class SwerveSubsystem extends SubsystemBase {
         //     isalliancereset = true;
         // }
 
-        // TODO: Test
-        // WARNING: REMOVE IF USING TAG FOLLOW!!!
-        // updateVisionOdometry();
-
+        
         odometry.update(getRotation2d(), getModulePositions());
-        // if (DriverStation.getAlliance().isPresent()) {
-        // switch (DriverStation.getAlliance().get()) {
-        // case Red:
-        // field.setRobotPose(new Pose2d(new Translation2d(16.5 - getPose().getX(),
-        // getPose().getY()),
-        // getPose().getRotation()));
-        // break;
+        PhotonCameraContainer.estimateVisionOdometry(odometry);
 
-        // case Blue:
-        // field.setRobotPose(getPose());
-        // break;
-        // }
-        // } else {
-        // // If no alliance provided, just go with blue
         field.setRobotPose(getPose());
-
         robotPose.set(getPose());
 
-        // }
 
         SmartDashboard.putData("Field", field);
 

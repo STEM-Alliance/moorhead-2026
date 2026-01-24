@@ -4,9 +4,20 @@
 
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.ElasticSubsystem;
+import frc.robot.util.PhotonCameraContainer;
+import frc.robot.util.VisionCamera;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -16,12 +27,28 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+   private final CommandXboxController driverXbox = new CommandXboxController(
+            ControllerConstants.DRIVER_CONTROLLER_PORT);
+    private final CommandXboxController operatorXbox = new CommandXboxController(
+            ControllerConstants.OPERATOR_CONTROLLER_PORT);
+
+    // private final CommandXboxController debugXbox = new CommandXboxController(0);
+    // private final PhotonCamera photonCamera = new PhotonCamera("driveCamera");
+    private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem(null);
+    // private final LEDSubsystem m_LedSubsystem = new LEDSubsystem();
+  
+    // need can id of sensor to declare next line
+    // private final TofDistanceSubsystem tofDistanceSubsystem = new
+    // TofDistanceSubsystem();
+    // private final LimeLightSubsystem limeLightSubsystem = new
+    // LimeLightSubsystem();
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
+    
+    PhotonCameraContainer.addPhotonCamera("driveCamera");
+    
     configureBindings();
   }
 
