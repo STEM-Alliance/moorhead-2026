@@ -1,19 +1,15 @@
 package frc.robot.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.targeting.MultiTargetPNPResult;
 import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Constants.PoseConstants;
 
 public class PhotonCameraContainer {
@@ -25,22 +21,27 @@ public class PhotonCameraContainer {
         cameraCount++;
     }
 
+    public static void addPhotonCamera(VisionCamera camera) {
+        cameras.add(camera);
+        cameraCount++;
+    }
+
     public static void estimateVisionOdometry(SwerveDrivePoseEstimator odometry) {
 
         for (VisionCamera visionCamera : cameras) {
             if (visionCamera.isEnabled()) {
                 PhotonCamera camera = visionCamera.getPhotonCamera();
-                var results = camera.getAllUnreadResults();
+                List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+                visionCamera.isSingleTagEstimationEnabled();
 
                 for (PhotonPipelineResult result : results) {
                     if (result.getMultiTagResult().isPresent()) {
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
                         odometry.addVisionMeasurement(toPose2D(multiTagPose), result.getTimestampSeconds());
-                        
 
-                    } else if (result.getBestTarget() != null) {
-                        var tagToCamera = result.getBestTarget().altCameraToTarget;
+                    } else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
 
+                        Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
                         Pose3d tagToField = PoseConstants.kAprilTagFieldLayout
                                 .getTagPose(result.getBestTarget().fiducialId).get();
 

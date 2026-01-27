@@ -6,7 +6,6 @@ import org.photonvision.PhotonCamera;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.GoalEndState;
@@ -38,7 +37,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
@@ -46,8 +44,8 @@ import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.SwerveModuleConstants;
-import frc.robot.util.PhotonCameraContainer;
 import frc.robot.Robot;
+import frc.robot.util.PhotonCameraContainer;
 
 public class SwerveSubsystem extends SubsystemBase {
     SwerveModule frontLeft = new SwerveModule(SwerveModuleConstants.FL_STEER_ID, SwerveModuleConstants.FL_DRIVE_ID,
@@ -92,10 +90,6 @@ public class SwerveSubsystem extends SubsystemBase {
      */
     public enum RotationStyle {
         Driver,
-        Home,
-        Aimbot,
-        AimLeft,
-        AimRight
     }
 
     private RotationStyle rotationStyle = RotationStyle.Driver;
@@ -123,11 +117,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     PoseConstants.kVisionStdDevY,
                     PoseConstants.kVisionStdDevTheta));
 
-    public SwerveSubsystem(PhotonCamera mPhotonCamera) {
-        photonCamera = mPhotonCamera;
-        // ! F
-        // zeroHeading()
-
+    public SwerveSubsystem() {
         // --------- Path Planner Init ---------- \\
 
         AutoBuilder.configure(
@@ -152,8 +142,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 },
                 this // Reference to this subsystem to set requirements
         );
-
-        NamedCommands.registerCommand("namedCommand", new PrintCommand("Ran namedCommand"));
         
         chassisAccelX = new DoubleLogEntry(DataLogManager.getLog(), "Chassis/acceleration/x");
         chassisAccelY = new DoubleLogEntry(DataLogManager.getLog(), "Chassis/acceleration/y");
@@ -165,13 +153,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
-        // if (!isalliancereset && DriverStation.getAlliance().isPresent()) {
-        //     Translation2d pospose = getPose().getTranslation();
-        //     odometry.resetPosition(getRotation2d(), getModulePositions(),
-        //             new Pose2d(pospose, new Rotation2d(FieldConstants.getAlliance() == Alliance.Blue ? 0.0 : Math.PI)));
-        //     isalliancereset = true;
-        // }
 
         
         odometry.update(getRotation2d(), getModulePositions());
@@ -185,11 +166,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
         SmartDashboard.putString("Robot Pose",
                 getPose().toString());
-        // double swerveCurrent = 0;
-        // for (int chan : pdh_channels)
-        // swerveCurrent += pdh.getCurrent(chan);
-        // SmartDashboard.putNumber("SwerveSubsystem Amps", swerveCurrent);
-        // SmartDashboard.putNumber("PDH Amps", pdh.getTotalCurrent());
 
         SmartDashboard.putNumberArray("SwerveStates", new double[] {
                 frontLeft.getModuleState().angle.getDegrees() + 90, -frontLeft.getModuleState().speedMetersPerSecond,
@@ -214,22 +190,18 @@ public class SwerveSubsystem extends SubsystemBase {
         if (Robot.isSimulation()) {
             pigeonSim = Units.degreesToRadians(deg);
         }
-        // pigeon.reset();
-        // pigeon.setAngleAdjustment(deg);
 
-        double error = deg - pigeon.getYaw().getValueAsDouble(); //in 2026, getAngle will be removed so look into getYaw()
+        double error = deg - pigeon.getYaw().getValueAsDouble();
         double new_adjustment = pigeon.getYaw().getValueAsDouble() + error;
         pigeon.setYaw(new_adjustment);
     }
 
     public Pose2d getPose() {
-        Pose2d pose = odometry.getEstimatedPosition().rotateBy(new Rotation2d(Math.PI));
-        Pose2d flippedPose = new Pose2d(pose.getX(), -pose.getY(), pose.getRotation().times(-1));
         return odometry.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
-        // TODO: TEST
+        //TODO: TEST
         setHeading(Units.radiansToDegrees(pose.getRotation().times(-1.0).getRadians()
                 + (FieldConstants.getAlliance() == Alliance.Red ? Math.PI : 0.0)));
 
@@ -264,9 +236,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setChassisSpeedsAUTO(ChassisSpeeds speeds) {
         double tmp = speeds.vxMetersPerSecond;
-        // speeds.vxMetersPerSecond = -speeds.vyMetersPerSecond;
-        // speeds.vyMetersPerSecond = -tmp;
-        // tmp = speeds.omegaRadiansPerSecond;
         speeds.vxMetersPerSecond = MathUtil.clamp(-speeds.vyMetersPerSecond, -2, 2);
         speeds.vyMetersPerSecond = MathUtil.clamp(-tmp, -2, 2);
         tmp = MathUtil.clamp(speeds.omegaRadiansPerSecond, -Math.PI/2, Math.PI/2);
@@ -365,12 +334,8 @@ public class SwerveSubsystem extends SubsystemBase {
         // Create the path using the bezier points created above
         PathPlannerPath path = PathPlannerPath.fromPathPoints(
                 List.of(pathPoints),
-                new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path. If using a
-                                                                         // differential drivetrain, the angular
-                                                                         // constraints have no effect.
-                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation
-                                                                   // here. If using a differential drivetrain, the
-                                                                   // rotation will have no effect.
+                new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), 
+                new GoalEndState(0.0, Rotation2d.fromDegrees(-90))
         );
 
         // Prevent the path from being flipped if the coordinates are already correct
