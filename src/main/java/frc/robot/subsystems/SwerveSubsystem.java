@@ -89,7 +89,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Sets Rotation style of the robot, which could be used to control drive modes
      */
     public enum RotationStyle {
-        Driver,
+        Driver, Aimbot
     }
 
     private RotationStyle rotationStyle = RotationStyle.Driver;

@@ -4,16 +4,20 @@
 
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.FieldConstants;
 
 /**
  * The methods in this class are called automatically corresponding to each
@@ -26,6 +30,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private final RobotContainer m_robotContainer;
+  private Pose3d hub = new Pose3d();
+  StructPublisher<Pose3d> publisher = NetworkTableInstance.getDefault()
+  .getStructTopic("Hub", Pose3d.struct).publish();
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -73,6 +80,8 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods. This must be called from the
     // robot's periodic
     // block in order for anything in the Command-based framework to work.
+    hub = FieldConstants.getHubPosition();
+    publisher.set(hub);
     CommandScheduler.getInstance().run();
   }
 

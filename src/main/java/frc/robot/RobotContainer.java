@@ -9,8 +9,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.ShootOnTheFlyCalculatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.util.PhotonCameraContainer;
+import frc.robot.util.ShootOnTheFlyCalculator;
 import frc.robot.util.VisionCamera;
 
 /**
@@ -28,8 +30,8 @@ public class RobotContainer {
       ControllerConstants.DRIVER_CONTROLLER_PORT);
   private final CommandXboxController operatorXbox = new CommandXboxController(
       ControllerConstants.OPERATOR_CONTROLLER_PORT);
-
   private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+  private final ShootOnTheFlyCalculatorSubsystem shootOnTheFlyCalculatorSubsystem = new ShootOnTheFlyCalculatorSubsystem(swerveDriveSubsystem);
 
   private final DriveCommand driveCommand = new DriveCommand(swerveDriveSubsystem, driverXbox);
 

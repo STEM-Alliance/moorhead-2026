@@ -6,7 +6,9 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -19,7 +21,11 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.AimbotConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.subsystems.ShootOnTheFlyCalculatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.util.ChassisAccelerations;
+import frc.robot.util.ShootOnTheFlyCalculator;
+import frc.robot.util.ShootOnTheFlyCalculator.InterceptSolution;
 
 public class DriveCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
@@ -43,7 +49,7 @@ public class DriveCommand extends Command {
     public DriveCommand(SwerveSubsystem swerveSubsystem, CommandXboxController driverXbox) {
         this.swerveSubsystem = swerveSubsystem;
         this.xbox = driverXbox.getHID();
-       
+
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
         dsratelimiter.reset(SLOWMODE_MULT);
@@ -79,9 +85,8 @@ public class DriveCommand extends Command {
         Translation2d xyRaw = new Translation2d(xbox.getLeftX(), xbox.getLeftY());
         Translation2d xySpeed = DeadBand(xyRaw, 0.15 / 2.f);
         double zSpeed = -DeadBand(xbox.getRightX(), 0.15);
-        double xSpeed = -xySpeed.getX(); 
-        double ySpeed = xySpeed.getY(); 
-
+        double xSpeed = -xySpeed.getX();
+        double ySpeed = xySpeed.getY();
 
         xSpeed *= DriveConstants.XY_SPEED_LIMIT * DriveConstants.MAX_ROBOT_VELOCITY;
         ySpeed *= DriveConstants.XY_SPEED_LIMIT * DriveConstants.MAX_ROBOT_VELOCITY;
@@ -104,7 +109,7 @@ public class DriveCommand extends Command {
         ChassisSpeeds speeds = new ChassisSpeeds();
 
         switch (swerveSubsystem.getRotationStyle()) {
-           
+
             case Driver -> {
                 speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-ySpeed, xSpeed, zSpeed,
                         new Rotation2d(
@@ -112,10 +117,21 @@ public class DriveCommand extends Command {
                                         .getRadians()));
             }
 
+            case Aimbot -> {
+                InterceptSolution solution = ShootOnTheFlyCalculatorSubsystem.getInterceptSolution();
+                double rotationSpeed = (solution == null ? 0
+                        : rotationController.calculate(swerveSubsystem.getHeading(), solution.requiredYaw()));
+                        
+                speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-ySpeed, xSpeed, rotationSpeed,
+                        new Rotation2d(
+                                -swerveSubsystem.getRotation2d().rotateBy(DriveConstants.NAVX_ANGLE_OFFSET)
+                                        .getRadians()));
+
+            }
+
             default -> {
 
             }
-                
 
         }
 
