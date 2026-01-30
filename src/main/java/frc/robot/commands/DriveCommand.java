@@ -23,7 +23,6 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class DriveCommand extends Command {
     private final SwerveSubsystem swerveSubsystem;
     private final XboxController xbox;
-    private PhotonCamera m_photonCamera;
     private SlewRateLimiter dsratelimiter = new SlewRateLimiter(4);
 
     // Auto rotation pid/rate limiter
@@ -39,10 +38,9 @@ public class DriveCommand extends Command {
 
     private DriveState state = DriveState.Free;
 
-    public DriveCommand(SwerveSubsystem swerveSubsystem, XboxController xbox, PhotonCamera m_photonCamera) {
+    public DriveCommand(SwerveSubsystem swerveSubsystem, XboxController xbox) {
         this.swerveSubsystem = swerveSubsystem;
         this.xbox = xbox;
-        this.m_photonCamera = m_photonCamera;
 
         rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
@@ -114,120 +112,18 @@ public class DriveCommand extends Command {
             // swerveSubsystem.resetOdometry(new Pose2d(1.38, 5.55, new Rotation2d()));
             // swerveSubsystem.zeroHeading();
         }
-        var result = m_photonCamera.getLatestResult();
 
         ChassisSpeeds speeds = new ChassisSpeeds();
 
         switch (swerveSubsystem.getRotationStyle()) {
-            case Aimbot:
-
-                if (result.hasTargets()) {
-                    double yaw = getResultYaw(result);
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
-                    zSpeed = deltaYaw;
-                }
-
-                speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-ySpeed, xSpeed, zSpeed,
-                        new Rotation2d(
-                                -swerveSubsystem.getRotation2d().rotateBy(DriveConstants.NAVX_ANGLE_OFFSET)
-                                        .getRadians()));
-                break;
-            case Home:
-
-                if (result.hasTargets()) {
-                    double yaw = getResultYaw(result);
-                    double skew = getSkew(result);
-                    double deltaX;
-
-                    // SmartDashboard.putNumber("Target Yaw", yaw);
-
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
-                    zSpeed = -deltaYaw;
-                    // xSpeed = xbox.getLeftY() * (Math.sin(Math.toRadians(-deltaYaw)) -
-                    // AimbotConstants.skewController.calculate(skew, 180));
-
-                    xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw));
-                    ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw));
-
-                    SmartDashboard.putNumber("Xspeed", xSpeed);
-                    SmartDashboard.putNumber("Yspeed", ySpeed);
-                }
-                speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
-
-                // if (result.hasTargets()) {
-                // double yaw = getResultYaw(result);
-                // SmartDashboard.putNumber("Target Yaw", yaw);
-
-                // double deltaYaw = AimbotConstants.pidController.calculate(yaw, 0);
-                // zSpeed = -deltaYaw;
-
-                // xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw));
-                // ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw));
-
-                // SmartDashboard.putNumber("Xspeed", xSpeed);
-                // SmartDashboard.putNumber("Yspeed", ySpeed);
-                // }
-                // speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
-
-                break;
-            case AimLeft:
-
-                if (result.hasTargets()) {
-                    double distance = result.getBestTarget().getBestCameraToTarget().getMeasureX().baseUnitMagnitude();
-                    double xOffset = Units.inchesToMeters(6.5);
-                    double angleOffset = Math.atan(xOffset / distance);
-
-                    double yaw = getResultYaw(result);
-                    SmartDashboard.putNumber("Target Yaw", yaw);
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw - Units.radiansToDegrees(angleOffset),
-                            0);
-                    zSpeed = -deltaYaw;
-
-                    xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw) + angleOffset);
-                    ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw) + angleOffset);
-
-                    SmartDashboard.putNumber("Xspeed", xSpeed);
-                    SmartDashboard.putNumber("Yspeed", ySpeed);
-                } else {
-                    xSpeed = 0;
-                    ySpeed = xbox.getLeftY();
-                    zSpeed = 0;
-                }
-
-                speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
-
-                break;
-            case AimRight:
-
-                if (result.hasTargets()) {
-                    double distance = result.getBestTarget().getBestCameraToTarget().getMeasureX().baseUnitMagnitude();
-                    double xOffset = Units.inchesToMeters(6.5);
-                    double angleOffset = Math.atan(xOffset / distance);
-
-                    double yaw = getResultYaw(result);
-                    SmartDashboard.putNumber("Target Yaw", yaw);
-                    double deltaYaw = AimbotConstants.pidController.calculate(yaw + Units.radiansToDegrees(angleOffset),
-                            0);
-                    zSpeed = -deltaYaw;
-
-                    xSpeed = xbox.getLeftY() * Math.sin(Math.toRadians(-deltaYaw) - angleOffset);
-                    ySpeed = xbox.getLeftY() * Math.cos(Math.toRadians(-deltaYaw) - angleOffset);
-
-                    SmartDashboard.putNumber("Xspeed", xSpeed);
-                    SmartDashboard.putNumber("Yspeed", ySpeed);
-                } else {
-                    xSpeed = 0;
-                    ySpeed = xbox.getLeftY();
-                    zSpeed = 0;
-                }
-                speeds = new ChassisSpeeds(-xSpeed, ySpeed, -zSpeed);
-
-                break;
+           
             case Driver:
                 speeds = ChassisSpeeds.fromFieldRelativeSpeeds(-ySpeed, xSpeed, zSpeed,
                         new Rotation2d(
                                 -swerveSubsystem.getRotation2d().rotateBy(DriveConstants.NAVX_ANGLE_OFFSET)
                                         .getRadians()));
+                break;
+            default: 
                 break;
 
         }

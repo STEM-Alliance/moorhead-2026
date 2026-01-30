@@ -119,32 +119,30 @@ public class SwerveModule {
             return driveEncSim;
         // return driveMotorEncoder.getPosition();
         // TODO: Do the conversion in the motor
-        
-        return driveMotor.getPosition().getValueAsDouble() * (Math.PI * SwerveModuleConstants.WHEEL_DIAMETER / SwerveModuleConstants.DRIVE_GEAR_RATIO);
+        return driveMotor.getPosition().getValueAsDouble() * SwerveModuleConstants.DRIVE_ROTATION_TO_METER;
     }
 
     public double getDriveVelocity() {
         // return driveMotorEncoder.getVelocity();
-        return driveMotor.getVelocity().getValueAsDouble();
+        return driveMotor.getVelocity().getValueAsDouble() * SwerveModuleConstants.DRIVE_ROTATION_TO_METER;
     }
 
     public double getSteerPosition() {
         if (Robot.isSimulation())
             return steerEncSim;
-        
-            return driveMotor.getPosition().getValue().in(Radians);
-        }
+        return steerMotor.getPosition().getValueAsDouble() * SwerveModuleConstants.STEER_ROTATION_TO_RADIANS;
+    }
 
     public double getSteerVelocity() {
-        return steerMotor.getVelocity().getValue().in(RotationsPerSecond) * 60.0;
+        return steerMotor.getVelocity().getValueAsDouble() * SwerveModuleConstants.STEER_RADIANS_PER_MINUTE;
     }
 
     public double getAbsoluteEncoderPosition() {
-        double angle = Units.rotationsToRadians(absoluteEncoder.getPosition().getValueAsDouble());// * (Math.PI /
-        // 180.d);
+        double angle = Units.rotationsToRadians(absoluteEncoder.getPosition().getValueAsDouble());
         angle -= motorOffsetRadians;
         return angle * (isAbsoluteEncoderReversed ? -1.0 : 1.0);
     }
+
 
     public void resetEncoders() {
         // driveMotorEncoder.setPosition(0);

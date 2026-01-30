@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.ControllerConstants;
+import frc.robot.commands.DriveCommand;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -16,12 +19,20 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+private final CommandXboxController driverXbox = new CommandXboxController(
+      ControllerConstants.DRIVER_CONTROLLER_PORT);
+  private final CommandXboxController operatorXbox = new CommandXboxController(
+      ControllerConstants.OPERATOR_CONTROLLER_PORT);
+  private final SwerveSubsystem swerveDriveSubsystem = new SwerveSubsystem();
+   private final DriveCommand driveCommand = new DriveCommand(swerveDriveSubsystem, driverXbox.getHID());
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
+
+    swerveDriveSubsystem.setDefaultCommand(driveCommand);
     configureBindings();
   }
 

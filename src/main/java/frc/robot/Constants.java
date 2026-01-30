@@ -62,8 +62,8 @@ public final class Constants {
     public static final int PIGEON_ID = 6;
 
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
-    public static final double STEERING_GEAR_RATIO = 1.d / (150d / 7d);
-    public static final double DRIVE_GEAR_RATIO = (1.d / 6.75d);
+    public static final double STEERING_GEAR_RATIO = 11.d / (287d);
+    public static final double DRIVE_GEAR_RATIO = (1.d / 6.03d);
 
     public static final double DRIVE_ROTATION_TO_METER = DRIVE_GEAR_RATIO * Math.PI * WHEEL_DIAMETER;
     public static final double STEER_ROTATION_TO_RADIANS = STEERING_GEAR_RATIO * Math.PI * 2d;
@@ -78,14 +78,14 @@ public final class Constants {
     // public static final double MODULE_KD = 0.03;
 
     // NOTE: This may need additional tuning!
-    public static final double MODULE_KP = 0.285;// 0.75628;// 0.7491; //.5;
-    public static final double MODULE_KD = 0.0001;// 0.0057682; //0.0076954;
+    public static final double MODULE_KP = 0.2;// 0.75628;// 0.7491; //.5;
+    public static final double MODULE_KD = 0.000;// 0.0057682; //0.0076954;
 
     // --------- Front Left Module --------- \\
     public static final int FL_DRIVE_ID = 3;
     public static final int FL_STEER_ID = 4;
     public static final int FL_ABSOLUTE_ENCODER_PORT = 1;
-    public static final double FL_OFFSET_RADIANS = Units.rotationsToRadians(-0.253906) + Math.PI * 0.5 + Math.PI;
+    public static final double FL_OFFSET_RADIANS = Units.rotationsToRadians(0.240723);
     public static final boolean FL_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean FL_MOTOR_REVERSED = true;
 
@@ -93,7 +93,7 @@ public final class Constants {
     public static final int FR_DRIVE_ID = 1;
     public static final int FR_STEER_ID = 2;
     public static final int FR_ABSOLUTE_ENCODER_PORT = 2;
-    public static final double FR_OFFSET_RADIANS = Units.rotationsToRadians(-0.413818) + Math.PI * 0.5 + Math.PI;
+    public static final double FR_OFFSET_RADIANS = Units.rotationsToRadians(0.095459)+ (Math.PI / 4);
     public static final boolean FR_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean FR_MOTOR_REVERSED = true;
 
@@ -101,7 +101,7 @@ public final class Constants {
     public static final int BR_DRIVE_ID = 7;
     public static final int BR_STEER_ID = 8;
     public static final int BR_ABSOLUTE_ENCODER_PORT = 3;
-    public static final double BR_OFFSET_RADIANS = Units.rotationsToRadians(0.424805) + Math.PI * 0.5 + Math.PI;
+    public static final double BR_OFFSET_RADIANS = Units.rotationsToRadians(0.036377) + (Math.PI / 4);
     public static final boolean BR_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean BR_MOTOR_REVERSED = true;
 
@@ -109,7 +109,7 @@ public final class Constants {
     public static final int BL_DRIVE_ID = 5;
     public static final int BL_STEER_ID = 6;
     public static final int BL_ABSOLUTE_ENCODER_PORT = 4;
-    public static final double BL_OFFSET_RADIANS = Units.rotationsToRadians(0.370117) + Math.PI * 0.5 + Math.PI;
+    public static final double BL_OFFSET_RADIANS = Units.rotationsToRadians(-0.125244) - ((3 * Math.PI) / 4);
     public static final boolean BL_ABSOLUTE_ENCODER_REVERSED = false;
     public static final boolean BL_MOTOR_REVERSED = true;
 
@@ -129,8 +129,8 @@ public final class Constants {
     // TODO: ############## REPLACE PLACEHOLDERS ##############
     public static final double MAX_MODULE_CURRENT = 40;
 
-    public static final double TRACK_WIDTH = Units.inchesToMeters(25);
-    public static final double WHEEL_BASE = Units.inchesToMeters(25);
+    public static final double TRACK_WIDTH = Units.inchesToMeters(22);
+    public static final double WHEEL_BASE = Units.inchesToMeters(22);
     // TODO: Set this for FWERB V2
     public static final Rotation2d NAVX_ANGLE_OFFSET = Rotation2d.fromDegrees(-90);
     // TODO: I'm not going to touch this... but it seems important!
