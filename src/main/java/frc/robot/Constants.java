@@ -9,9 +9,16 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -61,15 +68,37 @@ public final class Constants {
   public static class RobotConstants {
     public static final double robotWidthMeters = Units.inchesToMeters(25.0);
     public static final double robotLengthMeters = Units.inchesToMeters(25.0);
-    
-      // TODO: ############## REPLACE PLACEHOLDERS ##############
-      public static final double TOTAL_MASS_KG = 10;
-      public static final double MOMENT_OF_INERTIA = 1;
-  }
 
+    // TODO: ############## REPLACE PLACEHOLDERS ##############
+    public static final double TOTAL_MASS_KG = 10;
+    public static final double MOMENT_OF_INERTIA = 1;
+  }
 
   public static final class FieldConstants {
     public static final double GRAVITY = 9.81;
+
+    public static final InterpolatingDoubleTreeMap DISTANCE_TO_SHOT_SPEED = new InterpolatingDoubleTreeMap();
+        static {
+            DISTANCE_TO_SHOT_SPEED.put(2.07, 7.0);
+            // DISTANCE_TO_SHOT_SPEED.put(2.41, 41.0);
+            // DISTANCE_TO_SHOT_SPEED.put(3.20, 45.0);
+            // DISTANCE_TO_SHOT_SPEED.put(3.87, 49.0);
+            // DISTANCE_TO_SHOT_SPEED.put(4.57, 52.0);
+            DISTANCE_TO_SHOT_SPEED.put(4.92, 9.0);
+            // DISTANCE_TO_SHOT_SPEED.put(0.0, 7.0);
+            // DISTANCE_TO_SHOT_SPEED.put(5.0, 8.25);
+            // DISTANCE_TO_SHOT_SPEED.put(10.0, 10.0);
+        }
+
+    public static final Translation3d topCenterPointBlue = new Translation3d(
+        PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47) / 2.0,
+        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
+        Units.inchesToMeters(72.0));
+
+      public static final Translation3d topCenterPointRed =  new Translation3d(
+        PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() - Units.inchesToMeters(47) / 2.0,
+        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
+        Units.inchesToMeters(72.0));
 
     public static Alliance getAlliance() {
       if (DriverStation.getAlliance().isPresent()) {
@@ -77,6 +106,15 @@ public final class Constants {
       }
 
       return Alliance.Blue;
+    }
+
+    public static Pose3d getHubPosition() {
+      Alliance alliance = getAlliance();
+      if (alliance == Alliance.Red) {
+        return new Pose3d(topCenterPointRed, new Rotation3d());
+      } else {
+        return new Pose3d(topCenterPointBlue, new Rotation3d());
+      }
     }
   }
 
@@ -138,15 +176,15 @@ public final class Constants {
   }
 
   public static class AimbotConstants {
-    public static final PIDController pidController = new PIDController(0.05,0.0,0.0012);
+    public static final PIDController pidController = new PIDController(0.05, 0.0, 0.0012);
   }
 
   public static class DriveConstants {
     // TODO: Make sure that this is correct - this is from the SDS website but needs
     // empirical verification
     public static final double MAX_MODULE_VELOCITY = 5.21;
-    public static final double MAX_ROBOT_VELOCITY = 5.21; //2.5
-    public static final double MAX_ROBOT_RAD_VELOCITY = 12.0; // Approx. Measured rads/sec 
+    public static final double MAX_ROBOT_VELOCITY = 5.21; // 2.5
+    public static final double MAX_ROBOT_RAD_VELOCITY = 12.0; // Approx. Measured rads/sec
 
     // TODO: ############## REPLACE PLACEHOLDERS ##############
     public static final double MAX_MODULE_CURRENT = 40;
@@ -172,7 +210,7 @@ public final class Constants {
         new Translation2d(-TRACK_WIDTH / 2.0, -WHEEL_BASE / 2.0));
 
     public static final double XY_SPEED_LIMIT = 1.0;
-    public static final double Z_SPEED_LIMIT = 1.0;  
+    public static final double Z_SPEED_LIMIT = 1.0;
   }
 
   public static final class CoralConstants {
@@ -192,26 +230,25 @@ public final class Constants {
     public static final int ELEVATOR_FOLLOWER_PORT = 10;
     public static final int ELEVATOR_LIMIT_SWITCH = 0;
     public static final int INTAKE_LIMIT_SWITCH = 16;
-    public static final double ELEVATOR_TOP_LIMIT = 120; //change to actual number
-    public static final double ELEVATOR_BOTTOM_LIMIT = 0; //change to actual number
+    public static final double ELEVATOR_TOP_LIMIT = 120; // change to actual number
+    public static final double ELEVATOR_BOTTOM_LIMIT = 0; // change to actual number
     public static final double ELEVATOR_SPEED_LIMIT = 0.25;
     public static final double ELEVATOR_PARK_HEIGHT = 16;
     public static final double ELEVATOR_SPEED_MODIFIER = 0.5;
-    public static final double LV1 = 12; //tween this value
-    public static final double LV2 = 31.5; //tween this value
-    public static final double LV3 = 64; //tween this value
-    public static final double LV4 = 119; //tween this value
+    public static final double LV1 = 12; // tween this value
+    public static final double LV2 = 31.5; // tween this value
+    public static final double LV3 = 64; // tween this value
+    public static final double LV4 = 119; // tween this value
     public static final double Intake = 7.5;
     public static final int CORAL_LEADER_PORT = 14;
     public static final int CORAL_FOLLOWER_PORT = 15;
     public static final double CORAL_INTAKE_SPEED = 0.2;
     public static final double CORAL_PLACE_SPEED = -0.2;
-  
- 
-    //pid valuse
-    public static final double kP = 0.01; //need to toon
-    public static final double kI = 0; //may not use
-    public static final double kD = 0; //may not use
+
+    // pid valuse
+    public static final double kP = 0.01; // need to toon
+    public static final double kI = 0; // may not use
+    public static final double kD = 0; // may not use
     public static final double PID_TOLERANCE = 0.1;
     // feed forward values
     public static final double kS = 0;
@@ -223,18 +260,18 @@ public final class Constants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
   }
 
-  public static class AlgaeConstants{
+  public static class AlgaeConstants {
     public static final int ALGAE_INTAKE_PORT = 13;
     public static final int ALGAE_MANIP_PORT = 19;
     public static final double kS = 0;
     public static final double kG = 0;
     public static final double kV = 0;
-    public static final double ALGAE_HOLD_SPEED = 0.2; //20 percent
-    public static final double ALGAE_INTAKE_SPEED = 0.5; //50 percent
+    public static final double ALGAE_HOLD_SPEED = 0.2; // 20 percent
+    public static final double ALGAE_INTAKE_SPEED = 0.5; // 50 percent
     public static final double ALGAE_PLACE_SPEED = -0.2;
     public static final int ALGAE_LIMIT_SWITCH = 3;
-    public static final double TOP_LIMIT = -50; //check
-    public static final double BOTTOM_LIMIT = 0; //check
+    public static final double TOP_LIMIT = -50; // check
+    public static final double BOTTOM_LIMIT = 0; // check
     public static final double deadband = 0.01;
 
     public static final double motorOffset = Units.rotationsToRadians(0);
@@ -248,28 +285,27 @@ public final class Constants {
     public static final PIDConstants ROTATION_PID = new PIDConstants(0.001, 0, 0);
 
     public static final PPHolonomicDriveController HOLONOMIC_FOLLOWER_CONTROLLER = new PPHolonomicDriveController(
-      TRANSLATION_PID,
-      ROTATION_PID
-    );
+        TRANSLATION_PID,
+        ROTATION_PID);
 
     public static final RobotConfig ROBOT_CONFIG = new RobotConfig(
-      RobotConstants.TOTAL_MASS_KG,
-      RobotConstants.MOMENT_OF_INERTIA,
-      new ModuleConfig(
-        
-        SwerveModuleConstants.WHEEL_DIAMETER / 2,
-        DriveConstants.MAX_MODULE_VELOCITY,
-        SwerveModuleConstants.WHEEL_FRICTION_COEFFICIENT, // TODO: ############## REPLACE PLACEHOLDERS ##############
-        DCMotor.getNEO(1),
-        DriveConstants.MAX_MODULE_CURRENT, // TODO: ############## REPLACE PLACEHOLDERS ##############
-        4
-      ),
-      DriveConstants.KINEMATICS.getModules()
-    );
+        RobotConstants.TOTAL_MASS_KG,
+        RobotConstants.MOMENT_OF_INERTIA,
+        new ModuleConfig(
+
+            SwerveModuleConstants.WHEEL_DIAMETER / 2,
+            DriveConstants.MAX_MODULE_VELOCITY,
+            SwerveModuleConstants.WHEEL_FRICTION_COEFFICIENT, // TODO: ############## REPLACE PLACEHOLDERS
+                                                              // ##############
+            DCMotor.getNEO(1),
+            DriveConstants.MAX_MODULE_CURRENT, // TODO: ############## REPLACE PLACEHOLDERS ##############
+            4),
+        DriveConstants.KINEMATICS.getModules());
   }
 
   public static final class PoseConstants {
-
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
+        .loadField(AprilTagFields.kDefaultField);
     public static final double kPositionStdDevX = 0.1;
     public static final double kPositionStdDevY = 0.1;
     public static final double kPositionStdDevTheta = 10;

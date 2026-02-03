@@ -52,6 +52,12 @@ public class RobotContainer {
   private final Telemetry logger = new Telemetry(DriveConstants.MAX_ROBOT_VELOCITY);
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   // Replace with CommandPS4Controller or CommandJoystick if needed
+  public RobotContainer() {
+    PhotonCameraContainer.addPhotonCamera(
+        new VisionCamera.Builder().withName("driveCamera")
+            .withCameraEnabled()
+            .withSingleTagEstimation()
+            .build());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
