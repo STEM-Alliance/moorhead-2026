@@ -1,17 +1,23 @@
 package frc.robot.subsystems;
 
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.Constants.SwerveModuleConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem implements Subsystem {
     /*
@@ -29,12 +35,22 @@ public class ShooterSubsystem implements Subsystem {
     /*
      * Voltage To Set Motor When m_shootMode==ShootMode.Shooting
      */
-    private double m_shootVoltage = 0;
+    private double m_shootRPM = 0;
     /*
      * List Of SpeedConsumers<double, consumer> that will be called once
      * the current RPM goes over the double (RPM) 
      */
-    private LinkedList<SpeedConsumer> m_reqesting = new LinkedList<>();
+    private SparkClosedLoopController shooterClosedLoop = null;
+    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("shooter");
+    private double targetHoodAngle = 0;
+
+    public double getTargetHoodAngle() {
+        return targetHoodAngle;
+    }
+
+    public void setTargetHoodAngle(double targetHoodAngle) {
+        this.targetHoodAngle = targetHoodAngle;
+    }
 
     public enum ShootMode {
         Shooting, Idle
@@ -44,43 +60,17 @@ public class ShooterSubsystem implements Subsystem {
         this.m_shootMode = shootMode;
         switch (m_shootMode) {
             case Shooting -> {
-                m_sparkMaxPair.primary().setVoltage(m_shootVoltage);
+                shooterClosedLoop.setSetpoint(m_shootRPM, ControlType.kVelocity);
             }
 
             case Idle -> {
-                m_sparkMaxPair.primary().setVoltage(0);
-                m_reqesting.clear();
+                shooterClosedLoop.setSetpoint(ShooterConstants.SHOOTER_IDLE_RPM, ControlType.kVelocity);
             }
         }
-    }
-
-    /*
-     * Gets A TargetRPM and a Consumer and accepts Consumer with current
-     * Saves SpeedConsumer(targetRPM, m_motorPair) -> LinkedList
-     * Awaits until getRPM() > TargetRPM
-     * Accepts m_motorPair with current rpm
-     */
-
-    public void speedGreaterThen(double targetRPM, Consumer<Double> m_motorPair) {
-        if (m_shootMode.equals(ShootMode.Idle)) {
-            System.out.println("Shooter Is Idle And Cant Shoot! Cancelled Request. (targetRPM=" + targetRPM + ")");
-            return;
-        }
-        if (getRPM() > targetRPM) {
-            System.out.println("RPM Already Higher Then Requested!");
-            m_motorPair.accept(getRPM());
-            return;
-        }
-        m_reqesting.add(new SpeedConsumer(targetRPM, m_motorPair));
     }
 
     public ShootMode getShootMode() {
         return m_shootMode;
-    }
-
-    public ShooterSubsystem setShootVoltage(double output_voltage) {
-        this.m_shootVoltage = output_voltage;
-        return this;
     }
 
     public MotorPair getShooterMotors() {
@@ -107,10 +97,14 @@ public class ShooterSubsystem implements Subsystem {
                 .idleMode(IdleMode.kCoast)
                 .inverted(configPrimary.reversed());
 
+        primaryConfig.closedLoop.pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I, ShooterConstants.SHOOTER_D);
+
         SparkMaxConfig followerConfig = new SparkMaxConfig();
         followerConfig
                 .idleMode(IdleMode.kCoast)
                 .inverted(configFollower.reversed());
+
+        shooterClosedLoop = primary.getClosedLoopController();
 
         primary.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -136,8 +130,7 @@ public class ShooterSubsystem implements Subsystem {
             .inverted(configHood.reversed());
 
         hoodConfig.encoder
-            .positionConversionFactor(SwerveModuleConstants.DRIVE_ROTATION_TO_METER)
-            .velocityConversionFactor(SwerveModuleConstants.DRIVE_METERS_PER_MINUTE);
+            .positionConversionFactor(ShooterConstants.HOOD_GEAR_RATIO);
 
         m_hoodSpark.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -158,12 +151,12 @@ public class ShooterSubsystem implements Subsystem {
 
     @Override
     public void periodic() {
-        for (SpeedConsumer consumer : m_reqesting) {
-            if (getRPM() >= consumer.speed) {
-                consumer.consumer.accept(getRPM());
-                m_reqesting.remove(consumer);
-            }
-        }
+        nt.putValue("target_hood_angle", NetworkTableValue.makeDouble(targetHoodAngle));
+        nt.putValue("target_shooter_rpm", NetworkTableValue.makeDouble(m_shootRPM));
+        nt.putValue("hood_angle", NetworkTableValue.makeDouble(getRPM()));
+        nt.putValue("shooter_rpm", NetworkTableValue.makeDouble(getHoodPosition()));
+
+        targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.HOOD_MIN_ANGLE, ShooterConstants.HOOD_MAX_ANGLE);
     }
 
     /*
@@ -185,6 +178,10 @@ public class ShooterSubsystem implements Subsystem {
         }
         if (Objects.isNull(m_hoodSpark)) {
             System.out.println("[WARNING] - HoodSpark Is Null");
+            return;
+        }
+        if (Objects.isNull(shooterClosedLoop)) {
+            System.out.println("[WARNING] - ShooterClosedLoop Is Null");
             return;
         }
     }
@@ -212,12 +209,5 @@ public class ShooterSubsystem implements Subsystem {
             Objects.requireNonNull(follower);
         }
     };
-
-    private record SpeedConsumer(double speed, Consumer<Double> consumer) {
-        private SpeedConsumer {
-            Objects.requireNonNull(speed);
-            Objects.requireNonNull(consumer);
-        }
-    }
 
 }

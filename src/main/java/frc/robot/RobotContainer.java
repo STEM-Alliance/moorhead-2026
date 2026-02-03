@@ -60,13 +60,12 @@ public class RobotContainer {
     // Configure the trigger bindings
     shooterSubsystem
         .setShooterMotors(
-            new ShootMotor(15, false), // Primary
-            new ShootMotor(16, true) // Follower
+            new ShootMotor(10, true), // Primary
+            new ShootMotor(11, false) // Follower
         )
         .setHoodMotor(
-          new ShootMotor(17, false)
+          new ShootMotor(12, false)
         )
-        .setShootVoltage(1)
         .finish();
 
     drivetrain.setDefaultCommand(
@@ -98,12 +97,7 @@ public class RobotContainer {
 
     opController.rightBumper().onTrue(new InstantCommand(() -> {
       shooterSubsystem.requestShootMode(ShootMode.Shooting);
-      shooterSubsystem.speedGreaterThen(1000, (rpm) -> {
-        // Release Ammo Door? IDK
-        System.out.println("Shooter Ready To Shoot! (" + rpm + " > 1000)");
-        shooterSubsystem.getShooterMotors().primary().getDeviceId();
-        shooterSubsystem.getShooterMotors().follower().getDeviceId();
-      });
+      
     })).onFalse(new InstantCommand(() -> shooterSubsystem.requestShootMode(ShootMode.Idle)));
 
     driveController.x().onTrue(new InstantCommand(() -> drivetrain.setDriveState(DriveState.Locked))).onFalse(

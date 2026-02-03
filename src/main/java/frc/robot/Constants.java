@@ -35,7 +35,29 @@ public final class Constants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
   }
+  public static class ShooterConstants {
+    public static final int HOOD_MOTOR_PORT = 1;
+    public static final int SHOOTER_LEADER_PORT = 2;
+    public static final int SHOOTER_FOLLOWER_PORT = 3;
 
+    public static final boolean SHOOTER_LEADER_INVERTED = false;
+    public static final boolean SHOOTER_FOLLOWER_INVERTED = true;
+    public static final boolean HOOD_INVERTED = false;
+    public static final double SHOOTER_MAX_RPM = 6500.0;
+    public static final double SHOOTER_IDLE_RPM = 1000.0;
+
+    public static final double HOOD_GEAR_RATIO = (12d / 48d) * (18d / 310d);
+    public static final double HOOD_MIN_ANGLE = 32.982;
+    public static final double HOOD_MAX_ANGLE = 72.982;
+
+    public static final double SHOOTER_P = 0.005;
+    public static final double SHOOTER_I = 0.000;
+    public static final double SHOOTER_D = 0.000;
+
+    public static final PIDController HOOD_PID = new PIDController(0.0, 0.0, 0.0);
+    
+
+  }
   public static class RobotConstants {
     public static final double robotWidthMeters = Units.inchesToMeters(25.0);
     public static final double robotLengthMeters = Units.inchesToMeters(25.0);
