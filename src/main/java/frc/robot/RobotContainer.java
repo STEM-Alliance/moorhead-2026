@@ -14,9 +14,11 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain.DriveState;
+import frc.robot.subsystems.CommandSwerveDrivetrain.RotationStyle;
 import frc.robot.subsystems.ShooterSubsystem.ShootMode;
 import frc.robot.subsystems.ShooterSubsystem.ShootMotor;
 import frc.robot.util.DriveStateHandler;
@@ -64,11 +66,11 @@ public class RobotContainer {
     // Configure the trigger bindings
     shooterSubsystem
         .setShooterMotors(
-            new ShootMotor(10, true), // Primary
-            new ShootMotor(11, false) // Follower
+            new ShootMotor(ShooterConstants.SHOOTER_LEADER_PORT, ShooterConstants.SHOOTER_LEADER_INVERTED), // Primary
+            new ShootMotor(ShooterConstants.SHOOTER_FOLLOWER_PORT, ShooterConstants.SHOOTER_FOLLOWER_INVERTED) // Follower
         )
         .setHoodMotor(
-          new ShootMotor(12, false)
+          new ShootMotor(ShooterConstants.HOOD_MOTOR_PORT, ShooterConstants.HOOD_INVERTED)
         )
         .finish();
 
@@ -96,7 +98,7 @@ public class RobotContainer {
 
     driveController.button(8).onTrue(new InstantCommand(() -> {
       System.out.println("Reset Rotation");
-      drivetrain.resetRotation(DriveConstants.GYRO_ANGLE_OFFSET);
+      drivetrain.resetRotation(Rotation2d.kZero);
     }));
 
     opController.rightBumper().onTrue(new InstantCommand(() -> {
@@ -104,8 +106,27 @@ public class RobotContainer {
       
     })).onFalse(new InstantCommand(() -> shooterSubsystem.requestShootMode(ShootMode.Idle)));
 
+    opController.pov(0).debounce(0.05).onTrue(new InstantCommand(() -> {
+      shooterSubsystem.addRPM(500);
+    }));
+
+    opController.pov(90).debounce(0.05).onTrue(new InstantCommand(() -> {
+      shooterSubsystem.addRPM(100);
+    }));
+
+    opController.pov(180).debounce(0.05).onTrue(new InstantCommand(() -> {
+      shooterSubsystem.addRPM(-500);
+    }));
+
+    opController.pov(270).debounce(0.05).onTrue(new InstantCommand(() -> {
+      shooterSubsystem.addRPM(-100);
+    }));
+
     driveController.x().onTrue(new InstantCommand(() -> drivetrain.setDriveState(DriveState.Locked))).onFalse(
         new InstantCommand(() -> drivetrain.setDriveState(DriveState.Free)));
+
+      driveController.y().onTrue(new InstantCommand(() -> drivetrain.setRotationStyle(RotationStyle.Aimbot))).onFalse(
+        new InstantCommand(() -> drivetrain.setRotationStyle(RotationStyle.Driver)));
 
     // Idle while the robot is disabled. This ensures the configured
     // neutral mode is applied to the drive motors while disabled.

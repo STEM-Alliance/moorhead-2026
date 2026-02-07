@@ -9,8 +9,13 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PoseConstants;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class PhotonCameraContainer {
     private static ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
@@ -26,7 +31,7 @@ public class PhotonCameraContainer {
         cameraCount++;
     }
 
-    public static void estimateVisionOdometry(SwerveDrivePoseEstimator odometry) {
+    public static void estimateVisionOdometry(CommandSwerveDrivetrain odometry) {
 
         for (VisionCamera visionCamera : cameras) {
             if (visionCamera.isEnabled()) {
@@ -37,21 +42,23 @@ public class PhotonCameraContainer {
                 for (PhotonPipelineResult result : results) {
                     if (result.getMultiTagResult().isPresent()) {
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
-                        odometry.addVisionMeasurement(toPose2D(multiTagPose), result.getTimestampSeconds());
+                        Pose2d pose = toPose2D(multiTagPose);
+                        odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
 
-                    } else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
+                    } 
+                    // else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
 
-                        Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
-                        Pose3d tagToField = PoseConstants.kAprilTagFieldLayout
-                                .getTagPose(result.getBestTarget().fiducialId).get();
+                    //     Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
+                    //     Pose3d tagToField = PoseConstants.kAprilTagFieldLayout
+                    //             .getTagPose(result.getBestTarget().fiducialId).get();
 
-                        if (tagToField == null)
-                            continue;
+                    //     if (tagToField == null)
+                    //         continue;
 
-                        Pose3d robotPose = tagToField.transformBy(tagToCamera);
-
-                        odometry.addVisionMeasurement(robotPose.toPose2d(), result.getTimestampSeconds());
-                    }
+                    //     Pose3d robotPose = tagToField.transformBy(tagToCamera);//.rotateBy(new Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
+                    //     // robotPose = robotPose.rotateAround(robotPose.getTranslation(), new Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
+                    //     odometry.addVisionMeasurement(robotPose.toPose2d(), result.getTimestampSeconds());
+                    // }
                 }
 
             }

@@ -8,7 +8,9 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -35,7 +37,7 @@ public class ShooterSubsystem implements Subsystem {
     /*
      * Voltage To Set Motor When m_shootMode==ShootMode.Shooting
      */
-    private double m_shootRPM = 0;
+    private double m_shootRPM = 500;
     /*
      * List Of SpeedConsumers<double, consumer> that will be called once
      * the current RPM goes over the double (RPM) 
@@ -54,6 +56,18 @@ public class ShooterSubsystem implements Subsystem {
 
     public enum ShootMode {
         Shooting, Idle
+    }
+
+    public void addRPM(double addRpm) {
+        applyShooterRPM(this.m_shootRPM + addRpm);
+    }
+
+    public void applyShooterRPM(double rpm) {
+        this.m_shootRPM = MathUtil.clamp(rpm, 0, ShooterConstants.SHOOTER_MAX_RPM);
+    }
+
+    public double getShooterRPM() {
+        return this.m_shootRPM;
     }
 
     public void requestShootMode(ShootMode shootMode) {
@@ -87,19 +101,17 @@ public class ShooterSubsystem implements Subsystem {
             return this;
         }
 
-        SparkMax primary = new SparkMax(configPrimary.canid(), MotorType.kBrushless);
-        SparkMax follower = new SparkMax(configFollower.canid(), MotorType.kBrushless);
+        SparkFlex primary = new SparkFlex(configPrimary.canid(), MotorType.kBrushless);
+        SparkFlex follower = new SparkFlex(configFollower.canid(), MotorType.kBrushless);
 
-        // TODO: Make This Actually Correct
-
-        SparkMaxConfig primaryConfig = new SparkMaxConfig();
+        SparkFlexConfig primaryConfig = new SparkFlexConfig();
         primaryConfig
                 .idleMode(IdleMode.kCoast)
                 .inverted(configPrimary.reversed());
 
         primaryConfig.closedLoop.pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I, ShooterConstants.SHOOTER_D);
 
-        SparkMaxConfig followerConfig = new SparkMaxConfig();
+        SparkFlexConfig followerConfig = new SparkFlexConfig();
         followerConfig
                 .idleMode(IdleMode.kCoast)
                 .inverted(configFollower.reversed());
@@ -109,7 +121,7 @@ public class ShooterSubsystem implements Subsystem {
         primary.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        followerConfig.follow(configPrimary.canid());
+        followerConfig.follow(configPrimary.canid(), configFollower.reversed());
         m_sparkMaxPair = new MotorPair(primary, follower);
 
         return this;
@@ -121,8 +133,6 @@ public class ShooterSubsystem implements Subsystem {
 
     public ShooterSubsystem setHoodMotor(ShootMotor configHood) {
         m_hoodSpark = new SparkMax(configHood.canid(), MotorType.kBrushless);
-
-        //TODO: Make This Correct
 
         SparkMaxConfig hoodConfig = new SparkMaxConfig();
         hoodConfig
@@ -203,7 +213,9 @@ public class ShooterSubsystem implements Subsystem {
      * 
      */
 
-    public record MotorPair(SparkMax primary, SparkMax follower) {
+    
+
+    public record MotorPair(SparkFlex primary, SparkFlex follower) {
         public MotorPair {
             Objects.requireNonNull(primary);
             Objects.requireNonNull(follower);
