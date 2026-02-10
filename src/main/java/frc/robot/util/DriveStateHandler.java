@@ -38,7 +38,7 @@ public class DriveStateHandler {
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(DriveConstants.MAX_ROBOT_VELOCITY * 0.01).withRotationalDeadband(DriveConstants.MAX_ROBOT_RAD_VELOCITY * 0.01) // Add a 10% deadband
+            .withDeadband(DriveConstants.MAX_ROBOT_VELOCITY * 0.1).withRotationalDeadband(DriveConstants.MAX_ROBOT_RAD_VELOCITY * 0.1) // Add a 10% deadband
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake xStance = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.Idle idle = new SwerveRequest.Idle();
@@ -101,6 +101,7 @@ public class DriveStateHandler {
                 xSpeed *= dmult;
                 ySpeed *= dmult;
                 zSpeed *= dmult;
+               
         switch (commandSwerveDrivetrain.getRotationStyle()) {
             case Driver -> {
                
@@ -122,19 +123,18 @@ public class DriveStateHandler {
                     SmartDashboard.putNumber("Target Offset", targetOffset);
 
                     // RelativeTo's rotation returns robot rotation
+                    double offsetX = robotPose.getX() - hubPose.getX(); // Long Side
+                    double offsetY = robotPose.getY() - hubPose.getY(); // Short Side
 
-                    double offsetY = hubPose.getY() - robotPose.getY(); // Short Side
-                    double offsetX = hubPose.getX() - robotPose.getX(); // Long Side
-
-                    double goalDegrees =  MathUtil.angleModulus(Math.tan(offsetY / offsetX) + Math.PI);
-                    double goalZSpeed = DriveConstants.AIMBOT_CONTROLLER.calculate(robotPose.getRotation().getRadians(), targetOffset);
-                    SmartDashboard.putNumber("OffsetDegree",goalDegrees);
+                    double goalDegrees = MathUtil.angleModulus(Math.atan2(offsetY , offsetX) + Math.PI);
+                    double goalZSpeed = DriveConstants.AIMBOT_CONTROLLER.calculate(robotPose.getRotation().getRadians(), goalDegrees);
+                    SmartDashboard.putNumber("Goal Degrees", goalDegrees);
                     SmartDashboard.putNumber("Robot Offset X", offsetX);
                     SmartDashboard.putNumber("Robot Offset Y", offsetY);
-                    SmartDashboard.putNumber("ZSpeed", MathUtil.angleModulus(goalZSpeed));
-                    // requestedDriveCommand = drive.withVelocityX(xSpeed)
-                    //         .withVelocityY(ySpeed)
-                    //         .withRotationalRate(goalZSpeed);
+                    SmartDashboard.putNumber("ZSpeed", goalZSpeed);
+                    requestedDriveCommand = drive.withVelocityX(xSpeed)
+                            .withVelocityY(ySpeed)
+                            .withRotationalRate(goalZSpeed);
                 }
             }
 

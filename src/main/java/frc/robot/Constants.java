@@ -194,7 +194,7 @@ public final class Constants {
     public static final Rotation2d GYRO_ANGLE_OFFSET = Rotation2d.fromDegrees(-90);
     // TODO: I'm not going to touch this... but it seems important!
     public static final double DRIVE_BASE_RADIUS = Units.inchesToMeters(15);
-    public static final PIDController AIMBOT_CONTROLLER = new PIDController(0.5,0,0);
+    public static final PIDController AIMBOT_CONTROLLER = new PIDController(4,0,0);
     public static final class ModuleIndices {
       public static final int FRONT_LEFT = 1;
       public static final int FRONT_RIGHT = 0;
