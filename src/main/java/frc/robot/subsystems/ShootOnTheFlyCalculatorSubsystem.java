@@ -1,21 +1,28 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
+import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.util.AllianceFlipUtil;
+import frc.robot.util.BallPhysics;
 import frc.robot.util.ChassisAccelerations;
 import frc.robot.util.ShootOnTheFlyCalculator;
+import frc.robot.util.BallPhysics.ShotSolution;
 import frc.robot.util.ShootOnTheFlyCalculator.InterceptSolution;
 
 public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
@@ -26,6 +33,8 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
     private double prevTimestamp = 0.0;
     private double dt = 0.02;
+    private Pose3d effectiveTargetLocation;
+    private ShotSolution shotSolution;
 
     private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("otf_calculator");
 
@@ -33,6 +42,8 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
     public ShootOnTheFlyCalculatorSubsystem(CommandSwerveDrivetrain commandSwerveDrivetrain) {
         this.drivetrain = commandSwerveDrivetrain;
+        this.effectiveTargetLocation = new Pose3d();
+        this.shotSolution = new ShotSolution(0,0,0);
     }
 
     @Override
@@ -48,7 +59,10 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         dt = Timer.getFPGATimestamp() - prevTimestamp;
 
         nt.putValue("is_otf_solution", NetworkTableValue.makeBoolean(isOTFSolution()));
-        otfSolutionPublisher.set(interceptSolution.effectiveTargetPose());
+        nt.putValue("shot_pitch", NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
+        nt.putValue("shot_speed", NetworkTableValue.makeDouble(shotSolution.launchSpeed()));
+        nt.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
+        otfSolutionPublisher.set(effectiveTargetLocation);
     }
 
     public void solveOTF() {
@@ -56,34 +70,45 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         Pose3d goal = FieldConstants.getHubPosition();
 
         Pose2d currentPose = drivetrain.getPose2d();
-        double targetDistance = currentPose.getTranslation().getDistance(goal.toPose2d().getTranslation());
 
-        interceptSolution = ShootOnTheFlyCalculator.solveShootOnTheFly(
-                toPose3d(currentPose),
+        effectiveTargetLocation = ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
+                currentPose,
                 goal, speeds, accel,
-                ShooterConstants.DISTANCE_TO_SHOT_SPEED.get(targetDistance),
-                5, 0.01
+                (dist) -> {return ShooterConstants.DISTANCE_TO_SHOOT_VELOCITY.get(dist);},
+                5, 0
 
-        );
+        );    
+
+        if(currentPose.getX() - goal.getX() > 0) {
+            effectiveTargetLocation = rotate180(effectiveTargetLocation);
+        }
+        double targetDistance = currentPose.getTranslation().getDistance(effectiveTargetLocation.toPose2d().getTranslation());
+
+        shotSolution = BallPhysics.solveBallisticWithIncomingAngle(new Pose3d(currentPose), effectiveTargetLocation, Units.degreesToRadians(1));
 
     }
 
-    public InterceptSolution getOTFSolution() {
-        return interceptSolution;
+    public Pose3d getOTFSolution() {
+        return effectiveTargetLocation;
+    }
+
+    public ShotSolution getShotSolution() {
+        return shotSolution;
     }
 
     public Rotation2d getAimAngle() {
         Pose2d targetPose;
         if (isOTFSolution()) {
-            targetPose = getOTFSolution().effectiveTargetPose().toPose2d();
+            targetPose = getOTFSolution().toPose2d();
         } else {
             targetPose = FieldConstants.getHubPosition().toPose2d();
         }
-
+        
         Pose2d robotPose = drivetrain.getPose2d();
-        Transform2d delta = targetPose.minus(robotPose);
+        double offsetX = robotPose.getX() - targetPose.getX(); // Long Side
+        double offsetY = robotPose.getY() - targetPose.getY(); // Short Side
 
-        return new Rotation2d(Math.atan2(delta.getY(), delta.getX()));
+        return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX)));
     }
 
     public boolean isAngleWithinTolerance() {
@@ -91,11 +116,15 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     }
 
     public boolean isOTFSolution() {
-        return interceptSolution != null;
+        return effectiveTargetLocation != new Pose3d();
     }
 
-    private Pose3d toPose3d(Pose2d pose2d) {
-        return new Pose3d(pose2d.getX(), pose2d.getY(), 0.0, new Rotation3d(pose2d.getRotation()));
+    public boolean isShotSolution() {
+        return shotSolution.equals(new ShotSolution(0, 0, 0));
+    }
+
+    private Pose3d rotate180(Pose3d pose3d) {
+        return pose3d.rotateAround(FieldConstants.getHubPosition().getTranslation(), new Rotation3d(0,0,Math.PI));
     }
 
 }

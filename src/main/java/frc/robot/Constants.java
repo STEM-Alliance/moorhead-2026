@@ -63,17 +63,29 @@ public final class Constants {
 
     public static final PIDController HOOD_PID = new PIDController(0.0165, 0.0, 0.0001);
 
-    public static final InterpolatingDoubleTreeMap DISTANCE_TO_SHOT_SPEED = new InterpolatingDoubleTreeMap();
+    public static final InterpolatingDoubleTreeMap DISTANCE_TO_SHOOT_VELOCITY = new InterpolatingDoubleTreeMap();
     static {
-      DISTANCE_TO_SHOT_SPEED.put(2.07, 7.0);
-      // DISTANCE_TO_SHOT_SPEED.put(2.41, 41.0);
-      // DISTANCE_TO_SHOT_SPEED.put(3.20, 45.0);
-      // DISTANCE_TO_SHOT_SPEED.put(3.87, 49.0);
-      // DISTANCE_TO_SHOT_SPEED.put(4.57, 52.0);
-      DISTANCE_TO_SHOT_SPEED.put(4.92, 9.0);
-      // DISTANCE_TO_SHOT_SPEED.put(0.0, 7.0);
-      // DISTANCE_TO_SHOT_SPEED.put(5.0, 8.25);
-      // DISTANCE_TO_SHOT_SPEED.put(10.0, 10.0);
+      // DISTANCE_TO_SHOT_SPEED.put(2.07, 7.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(2.41, 41.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(3.20, 45.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(3.87, 49.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(4.57, 52.0);
+      // DISTANCE_TO_SHOT_SPEED.put(4.92, 9.0);
+
+      // DISTANCE_TO_SHOT_SPEED.put(7.583,15.872);
+      DISTANCE_TO_SHOOT_VELOCITY.put(Units.feetToMeters(7.41), 2.4);
+      DISTANCE_TO_SHOOT_VELOCITY.put(Units.feetToMeters(17.58), 5.19);
+      // DISTANCE_TO_SHOT_SPEED.put(22.583,37.5);
+    }
+    public static final InterpolatingDoubleTreeMap SHOT_VELOCITY_TO_RPS = new InterpolatingDoubleTreeMap();
+    static {
+      SHOT_VELOCITY_TO_RPS.put(2.177, 33.34);
+      SHOT_VELOCITY_TO_RPS.put(5.1985, 50.0);
+      SHOT_VELOCITY_TO_RPS.put(7.244, 66.67);
+    }
+    public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
+    static {
+
     }
   }
 
@@ -87,7 +99,8 @@ public final class Constants {
 
   public static final class FieldConstants {
     public static final double GRAVITY = 9.81;
-
+    public static final double FIELD_LENGTH = PoseConstants.kAprilTagFieldLayout.getFieldLength();
+    public static final double FIELD_WIDTH = PoseConstants.kAprilTagFieldLayout.getFieldWidth();
     public static final Translation3d topCenterPointBlue = new Translation3d(
         PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47) / 2.0,
         PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
