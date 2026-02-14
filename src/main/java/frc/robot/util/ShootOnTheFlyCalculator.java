@@ -170,11 +170,11 @@ public class ShootOnTheFlyCalculator {
         Pose3d correctedTargetPose = new Pose3d();
         for (int i = 0; i < goalPositionIterations; i++) {
             double virtualGoalX = targetPose.getX()
-                    - shotTime * (fieldRelRobotVelocity.vxMetersPerSecond
+                    + shotTime * (fieldRelRobotVelocity.vxMetersPerSecond
                             + fieldRelRobotAcceleration.axMetersPerSecondSquared
                                     * accelerationCompensationFactor);
             double virtualGoalY = targetPose.getY()
-                    - shotTime * (fieldRelRobotVelocity.vyMetersPerSecond
+                    + shotTime * (fieldRelRobotVelocity.vyMetersPerSecond
                             + fieldRelRobotAcceleration.ayMetersPerSecondSquared
                                     * accelerationCompensationFactor);
 
