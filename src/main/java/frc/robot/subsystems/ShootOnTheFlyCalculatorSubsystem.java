@@ -82,6 +82,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         if(currentPose.getX() - goal.getX() > 0) {
             effectiveTargetLocation = rotate180(effectiveTargetLocation);
         }
+
         double targetDistance = currentPose.getTranslation().getDistance(effectiveTargetLocation.toPose2d().getTranslation());
 
         shotSolution = BallPhysics.solveBallisticWithIncomingAngle(new Pose3d(currentPose), effectiveTargetLocation, Units.degreesToRadians(1));
@@ -116,7 +117,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     }
 
     public boolean isOTFSolution() {
-        return effectiveTargetLocation != new Pose3d();
+        return !effectiveTargetLocation.equals(new Pose3d());
     }
 
     public boolean isShotSolution() {

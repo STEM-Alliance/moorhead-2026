@@ -11,6 +11,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -43,9 +44,9 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int HOOD_MOTOR_PORT = 1;
-    public static final int SHOOTER_LEADER_PORT = 2;
-    public static final int SHOOTER_FOLLOWER_PORT = 3;
+    public static final int HOOD_MOTOR_PORT = 10;
+    public static final int SHOOTER_LEADER_PORT = 11;
+    public static final int SHOOTER_FOLLOWER_PORT = 12;
 
     public static final boolean SHOOTER_LEADER_INVERTED = false;
     public static final boolean SHOOTER_FOLLOWER_INVERTED = true;
@@ -87,6 +88,33 @@ public final class Constants {
     static {
 
     }
+  }
+
+  public static final class IntakeConstants {
+    public static final int INTAKE_ROLLER_PORT = 20;
+    public static final int INTAKE_PIVOT_PORT = 21;
+
+    public static final double INTAKE_PIVOT_RATIO = (1.0 / 10.0);
+
+    public static final boolean INTAKE_REVERSED = false;
+    public static final boolean INTAKE_PIVOT_REVERSED = false;
+
+    public static final ArmFeedforward PIVOT_FEEDFORWARD = new ArmFeedforward(0.41, 6.1, 0.06);
+
+    public static final PIDController PIVOT_CONTROLLER = new PIDController(0.0, 0.0, 0.0);
+
+  }
+
+  public static final class HopperConstants {
+    public static final int HOPPER_ROLLERS_PORT = 30;
+    public static final boolean HOPPER_REVERSED = false;
+
+  }
+
+  public static final class KickerConstants {
+    public static final int KICKER_PORT = 40;
+    public static final boolean KICKER_REVERSED = false;
+
   }
 
   public static class RobotConstants {
