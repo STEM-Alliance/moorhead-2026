@@ -121,8 +121,7 @@ public class RobotContainer {
                                             @Override
                                             public boolean getAsBoolean() {
                                                 return RobotBase.isReal()
-                                                        ? shooter.isReadyToShoot()
-                                                                && otfSubsystem.isAngleWithinTolerance()
+                                                        ? shooter.isReadyToShoot() && otfSubsystem.isAngleWithinTolerance()
                                                         : true;
                                             }
                                         }),
