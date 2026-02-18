@@ -11,7 +11,9 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -24,9 +26,11 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ControllerConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.FieldConstants;
 import frc.robot.commands.ShootCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElasticSubsystem;
 import frc.robot.subsystems.ShootOnTheFlyCalculatorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.PhotonCameraContainer;
@@ -59,6 +63,7 @@ public class RobotContainer {
     private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final ShootOnTheFlyCalculatorSubsystem otfSubsystem = new ShootOnTheFlyCalculatorSubsystem(drivetrain);
     public final DriveSubsystem driveSubsystem = new DriveSubsystem(drivetrain, driveController.getHID());
+    private final ElasticSubsystem elasticSubsystem = new ElasticSubsystem();
 
     // ---------- Swerve Requests ----------\\
     private final SwerveRequest.Idle idle = new SwerveRequest.Idle();
@@ -78,6 +83,8 @@ public class RobotContainer {
                         .withCameraEnabled()
                         .withSingleTagEstimation()
                         .build());
+
+        
 
         drivetrain.setDefaultCommand(drivetrain.applyRequest(getDefaultDriveCommand()));
 
@@ -148,20 +155,20 @@ public class RobotContainer {
 
     private Supplier<SwerveRequest> getDefaultDriveCommand() {
         return () -> drive
-                .withVelocityX(-driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
-                        * DriveConstants.MAX_ROBOT_VELOCITY)
-                .withVelocityY(-driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
-                        * DriveConstants.MAX_ROBOT_VELOCITY)
+                .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
+                        * DriveConstants.MAX_ROBOT_VELOCITY * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
+                        * DriveConstants.MAX_ROBOT_VELOCITY * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
                 .withRotationalRate(-driveController.getRightX() * driveSubsystem.getSlewRateMultiplier()
                         * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
     }
 
     private Supplier<SwerveRequest> getAimRequest() {
         return () -> aimAtHub.withTargetDirection(otfSubsystem.getAimAngle())
-                .withVelocityX(-driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
-                        * DriveConstants.MAX_ROBOT_VELOCITY)
-                .withVelocityY(-driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
-                        * DriveConstants.MAX_ROBOT_VELOCITY)
+                .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
+                        * DriveConstants.MAX_ROBOT_VELOCITY * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
+                        * DriveConstants.MAX_ROBOT_VELOCITY * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
                 .withMaxAbsRotationalRate(0.25 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
 
     }
