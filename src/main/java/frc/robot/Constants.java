@@ -85,9 +85,7 @@ public final class Constants {
       SHOT_VELOCITY_TO_RPS.put(7.244, 66.67);
     }
     public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
-    static {
-
-    }
+    public static final double INCOMMING_SHOT_ANGLE = -40;
   }
 
   public static final class IntakeConstants {

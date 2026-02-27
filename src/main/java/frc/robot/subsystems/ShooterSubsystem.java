@@ -70,6 +70,7 @@ public class ShooterSubsystem extends SubsystemBase {
         nt.putValue("shooter_rpm", NetworkTableValue.makeDouble(shooterLeader.getEncoder().getVelocity()));
         nt.putValue("leader_temp", NetworkTableValue.makeDouble(shooterLeader.getMotorTemperature()));
         nt.putValue("follower_temp", NetworkTableValue.makeDouble(shooterFollower.getMotorTemperature()));
+        nt.putValue("actual_hood_angle", NetworkTableValue.makeDouble(getActualHoodAngle()));
 
         targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.HOOD_MIN_ANGLE,
                 ShooterConstants.HOOD_MAX_ANGLE);
@@ -82,7 +83,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void setTargetHoodAngle(double target) {
-        targetHoodAngle = target;
+        nt.putValue("goal_angle", NetworkTableValue.makeDouble(target));
+        targetHoodAngle = MathUtil.clamp(target, ShooterConstants.HOOD_MIN_ANGLE,
+                ShooterConstants.HOOD_MAX_ANGLE);
     }
 
     public double getTargetHoodAngle() {
@@ -93,8 +96,12 @@ public class ShooterSubsystem extends SubsystemBase {
         return Units.rotationsToDegrees(hoodMotor.getEncoder().getPosition());
     }
 
+    public double getActualHoodAngle() {
+        return getHoodAngle() + ShooterConstants.HOOD_TO_GROUND;
+    }
+
     public void setShooterRPM(double rpm) {
-        targetRPM = MathUtil.clamp(rpm, 0.0, ShooterConstants.SHOOTER_MAX_RPM);
+        targetRPM = MathUtil.clamp(rpm, 0.0, Double.MAX_VALUE);
     }
 
     public double getTargetShooterRPM() {

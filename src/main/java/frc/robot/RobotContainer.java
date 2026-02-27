@@ -31,6 +31,8 @@ import frc.robot.commands.ShootCommand;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElasticSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.KickerSubsystem;
 import frc.robot.subsystems.ShootOnTheFlyCalculatorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.PhotonCameraContainer;
@@ -61,6 +63,8 @@ public class RobotContainer {
 
     // ---------- Subsystems ----------\\
     private final ShooterSubsystem shooter = new ShooterSubsystem();
+    private final KickerSubsystem kickerSubsystem = new KickerSubsystem();
+    private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     private final ShootOnTheFlyCalculatorSubsystem otfSubsystem = new ShootOnTheFlyCalculatorSubsystem(drivetrain);
     public final DriveSubsystem driveSubsystem = new DriveSubsystem(drivetrain, driveController.getHID());
     private final ElasticSubsystem elasticSubsystem = new ElasticSubsystem();
@@ -116,16 +120,16 @@ public class RobotContainer {
                 .whileTrue(new ParallelCommandGroup(
                         new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
                         new RepeatCommand(new SequentialCommandGroup(
-                                new WaitUntilCommand(
-                                        new BooleanSupplier() {
-                                            @Override
-                                            public boolean getAsBoolean() {
-                                                return RobotBase.isReal()
-                                                        ? shooter.isReadyToShoot() && otfSubsystem.isAngleWithinTolerance()
-                                                        : true;
-                                            }
-                                        }),
-                                new ShootCommand(shooter),
+                                // new WaitUntilCommand(
+                                //         new BooleanSupplier() {
+                                //             @Override
+                                //             public boolean getAsBoolean() {
+                                //                 return RobotBase.isReal()
+                                //                         ? shooter.isReadyToShoot() && otfSubsystem.isAngleWithinTolerance()
+                                //                         : true;
+                                //             }
+                                //         }),
+                                new ShootCommand(shooter, intakeSubsystem, kickerSubsystem, otfSubsystem),
                                 // Add prep commands for shooting here...
                                 new PrintCommand("Shooting!")))))
                 .onFalse(drivetrain.applyRequest(getDefaultDriveCommand()));
