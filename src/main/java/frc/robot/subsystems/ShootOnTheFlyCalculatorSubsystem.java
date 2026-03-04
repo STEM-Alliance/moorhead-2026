@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
@@ -98,7 +99,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
     public void solveOTF() {
         ChassisSpeeds speeds = drivetrain.getChassisSpeeds();
-        Pose3d goal = FieldConstants.getHubPosition();
+        Pose3d goal = FieldConstants.getHubPosition().plus(new Transform3d(0d, 0d, -Units.inchesToMeters(18), new Rotation3d()));
 
         Pose2d currentPose = drivetrain.getPose2d();
 
@@ -115,6 +116,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         }
 
         double targetDistance = currentPose.getTranslation().getDistance(effectiveTargetLocation.toPose2d().getTranslation());
+        nt.putValue("target_distance", NetworkTableValue.makeDouble(targetDistance));
 
         shotSolution = BallPhysics.solveBallisticWithIncomingAngle(new Pose3d(currentPose), effectiveTargetLocation, Units.degreesToRadians(ShooterConstants.INCOMMING_SHOT_ANGLE));
 
@@ -144,7 +146,9 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     }
 
     public boolean isAngleWithinTolerance() {
-        return Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees()) < 5.0;
+        double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
+        nt.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
+        return angleOffset < 3.0;
     }
 
     public boolean isOTFSolution() {

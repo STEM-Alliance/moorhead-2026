@@ -10,19 +10,19 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.HopperConstants;
+import frc.robot.Constants.MidtakeConstants;
 
-public class HopperSubsystem extends SubsystemBase {
+public class MidtakeSubsystem extends SubsystemBase {
     private final SparkMax hopper;
     
-    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("hopper");
+    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("midtake");
 
     
-    public HopperSubsystem() {
-        hopper = new SparkMax(HopperConstants.HOPPER_ROLLERS_PORT, MotorType.kBrushless);
+    public MidtakeSubsystem() {
+        hopper = new SparkMax(MidtakeConstants.MIDTAKE_ROLLERS_PORT, MotorType.kBrushless);
 
         SparkMaxConfig hopperConfig = new SparkMaxConfig();
-        hopperConfig.inverted(HopperConstants.HOPPER_REVERSED);
+        hopperConfig.inverted(MidtakeConstants.MIDTAKE_REVERSED);
 
         hopper.configure(hopperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -30,14 +30,14 @@ public class HopperSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        nt.putValue("hopper_speed", NetworkTableValue.makeDouble(getHopperSpeed()));
+        nt.putValue("midtake_speed", NetworkTableValue.makeDouble(getMidtakeSpeed()));
     }
 
-    public double getHopperSpeed() {
+    public double getMidtakeSpeed() {
         return hopper.get();
     }
 
-    public void setHopperSpeed(double speed) {
+    public void setMidtakeSpeed(double speed) {
         hopper.set(speed);
     }
 }

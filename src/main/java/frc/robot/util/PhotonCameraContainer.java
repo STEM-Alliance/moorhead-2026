@@ -35,7 +35,7 @@ public class PhotonCameraContainer {
                 for (PhotonPipelineResult result : results) {
                     if (result.getMultiTagResult().isPresent()) {
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
-                        Pose2d pose = toPose2D(multiTagPose);
+                        Pose2d pose = toPose2D(multiTagPose.plus(visionCamera.getCameraOffset()));
                         odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
 
                     } 

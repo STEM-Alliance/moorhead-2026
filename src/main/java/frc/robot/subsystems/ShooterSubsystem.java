@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.FeedForwardConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -38,8 +39,9 @@ public class ShooterSubsystem extends SubsystemBase {
         SparkFlexConfig shooterLeaderConfig = new SparkFlexConfig();
         shooterLeaderConfig.idleMode(IdleMode.kCoast).inverted(ShooterConstants.SHOOTER_LEADER_INVERTED);
 
-        shooterLeaderConfig.closedLoop.pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I,
-                ShooterConstants.SHOOTER_D);
+        shooterLeaderConfig.closedLoop
+                .pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I, ShooterConstants.SHOOTER_D)
+                .apply(new FeedForwardConfig().kA(ShooterConstants.SHOOTER_kA).kV(ShooterConstants.SHOOTER_kV));
 
         SparkFlexConfig shooterFollowerConfig = new SparkFlexConfig();
         shooterFollowerConfig.idleMode(IdleMode.kCoast).inverted(ShooterConstants.SHOOTER_FOLLOWER_INVERTED)
@@ -57,8 +59,11 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterClosedLoop = shooterLeader.getClosedLoopController();
 
         hoodMotor = new SparkMax(ShooterConstants.HOOD_MOTOR_PORT, MotorType.kBrushless);
+        
+        hoodMotor.getEncoder().setPosition(ShooterConstants.MIN_HOOD_ANGLE / 360.0);
 
         hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     }
 
     @Override
@@ -70,10 +75,9 @@ public class ShooterSubsystem extends SubsystemBase {
         nt.putValue("shooter_rpm", NetworkTableValue.makeDouble(shooterLeader.getEncoder().getVelocity()));
         nt.putValue("leader_temp", NetworkTableValue.makeDouble(shooterLeader.getMotorTemperature()));
         nt.putValue("follower_temp", NetworkTableValue.makeDouble(shooterFollower.getMotorTemperature()));
-        nt.putValue("actual_hood_angle", NetworkTableValue.makeDouble(getActualHoodAngle()));
-
-        targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.HOOD_MIN_ANGLE,
-                ShooterConstants.HOOD_MAX_ANGLE);
+        nt.putValue("hood_current", NetworkTableValue.makeDouble(hoodMotor.getOutputCurrent()));
+        targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.MIN_HOOD_ANGLE,
+                ShooterConstants.HOOD_MAX_ANGLE + ShooterConstants.MIN_HOOD_ANGLE);
 
         shooterClosedLoop.setSetpoint(targetRPM, ControlType.kVelocity);
         double hoodOutput = -ShooterConstants.HOOD_PID.calculate(targetHoodAngle, getHoodAngle());
@@ -84,8 +88,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void setTargetHoodAngle(double target) {
         nt.putValue("goal_angle", NetworkTableValue.makeDouble(target));
-        targetHoodAngle = MathUtil.clamp(target, ShooterConstants.HOOD_MIN_ANGLE,
-                ShooterConstants.HOOD_MAX_ANGLE);
+         targetHoodAngle = MathUtil.clamp(target, ShooterConstants.MIN_HOOD_ANGLE,
+                ShooterConstants.HOOD_MAX_ANGLE + ShooterConstants.MIN_HOOD_ANGLE);
     }
 
     public double getTargetHoodAngle() {
@@ -94,10 +98,6 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public double getHoodAngle() {
         return Units.rotationsToDegrees(hoodMotor.getEncoder().getPosition());
-    }
-
-    public double getActualHoodAngle() {
-        return getHoodAngle() + ShooterConstants.HOOD_TO_GROUND;
     }
 
     public void setShooterRPM(double rpm) {
@@ -113,7 +113,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isReadyToShoot() {
-        return Math.abs(getHoodAngle() - targetHoodAngle) < 0.5 && Math.abs(getShooterRPM() - targetRPM) < 100;
+        return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 400;
     }
 
 }
