@@ -77,24 +77,24 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         nt.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
         otfSolutionPublisher.set(effectiveTargetLocation);
 
-        counter++;
-        if (counter > 10) {
-            counter = 0;
-             Translation3d drivetrainVeloTransform = new Translation3d(drivetrain.getChassisSpeeds().vxMetersPerSecond,
-                drivetrain.getChassisSpeeds().vyMetersPerSecond, 0);
-                Pose2d drivetrainPose = drivetrain.getPose2d();
-            ballSimulator.addBall(new BallState(
-                new Pose3d(new Translation3d(drivetrainPose.getX(), drivetrainPose.getY(), 0),
-                                new Rotation3d(drivetrainPose.getRotation())),
-                new Translation3d(
-                                shotSolution.launchSpeed() * Math.cos(shotSolution.launchPitchRad()),
-                                0,
-                                shotSolution.launchSpeed() * Math.sin(shotSolution.launchPitchRad()))
-                                .rotateBy(new Rotation3d(drivetrainPose.getRotation()))
-                                .plus(drivetrainVeloTransform),
-                        new Translation3d(0, 100, 0)));
-        }
-        ballSimulator.update();
+        // counter++;
+        // if (counter > 10) {
+        //     counter = 0;
+        //      Translation3d drivetrainVeloTransform = new Translation3d(drivetrain.getChassisSpeeds().vxMetersPerSecond,
+        //         drivetrain.getChassisSpeeds().vyMetersPerSecond, 0);
+        //         Pose2d drivetrainPose = drivetrain.getPose2d();
+        //     ballSimulator.addBall(new BallState(
+        //         new Pose3d(new Translation3d(drivetrainPose.getX(), drivetrainPose.getY(), 0),
+        //                         new Rotation3d(drivetrainPose.getRotation())),
+        //         new Translation3d(
+        //                         shotSolution.launchSpeed() * Math.cos(shotSolution.launchPitchRad()),
+        //                         0,
+        //                         shotSolution.launchSpeed() * Math.sin(shotSolution.launchPitchRad()))
+        //                         .rotateBy(new Rotation3d(drivetrainPose.getRotation()))
+        //                         .plus(drivetrainVeloTransform),
+        //                 new Translation3d(0, 100, 0)));
+        // }
+        // ballSimulator.update();
     }
 
     public void solveOTF() {
@@ -148,7 +148,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     public boolean isAngleWithinTolerance() {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
         nt.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
-        return angleOffset < 3.0;
+        return angleOffset < 3.0 || Math.abs(360 - angleOffset) < 3.0;
     }
 
     public boolean isOTFSolution() {

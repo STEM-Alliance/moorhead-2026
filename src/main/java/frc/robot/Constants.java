@@ -84,9 +84,10 @@ public final class Constants {
     }
     public static final InterpolatingDoubleTreeMap SHOT_VELOCITY_TO_RPS = new InterpolatingDoubleTreeMap();
     static {
-      SHOT_VELOCITY_TO_RPS.put(2.177, 33.34);
-      SHOT_VELOCITY_TO_RPS.put(5.1985, 50.0);
-      SHOT_VELOCITY_TO_RPS.put(7.244, 66.67);
+            SHOT_VELOCITY_TO_RPS.put(2.177 * 0.5, 22.34);
+      SHOT_VELOCITY_TO_RPS.put(2.177, 49.0);
+      SHOT_VELOCITY_TO_RPS.put(5.1985, 56.0);
+      SHOT_VELOCITY_TO_RPS.put(7.244, 63.0);
     }
     public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
     public static final double INCOMMING_SHOT_ANGLE = -40;
@@ -106,15 +107,15 @@ public final class Constants {
     public static final ProfiledPIDController PIVOT_CONTROLLER = new ProfiledPIDController(0.28, 0.0, 0.01, new Constraints(100, 100));
 
     public static final double INTAKE_SPEED = 0.4;
-    public static final double PIVOT_MIN = 0;
-    public static final double PIVOT_MAX = 22.1;
+    public static final double PIVOT_MIN = 11;
+    public static final double PIVOT_MAX = 22.5;
   }
 
   public static final class MidtakeConstants {
     public static final int MIDTAKE_ROLLERS_PORT = 30;
     public static final boolean MIDTAKE_REVERSED = false;
 
-    public static final double MIDTAKE_SPEED = 0.25;
+    public static final double MIDTAKE_SPEED = 0.4;
 
   }
 
@@ -185,7 +186,7 @@ public final class Constants {
     // TODO: Set this for FWERB V2
     public static final Rotation2d GYRO_ANGLE_OFFSET = Rotation2d.fromDegrees(-90);
 
-    public static final PIDController ROTATION_CONTROLLER = new PIDController(3, 0.0, 0.001);
+    public static final PIDController ROTATION_CONTROLLER = new PIDController(5, 0.0, 0.001);
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),

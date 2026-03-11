@@ -66,6 +66,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     }
 
+    public SparkMax getHoodMotor() {
+        return this.hoodMotor;
+    }
+
     @Override
     public void periodic() {
 
@@ -113,7 +117,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isReadyToShoot() {
-        return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 400;
+        return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 200;
     }
 
 }

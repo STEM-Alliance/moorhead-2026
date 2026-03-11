@@ -1,0 +1,834 @@
+[
+    {
+        "timestamp": 210.72061157226562,
+        "seqNumber": 705,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 210.72116088867188,
+        "seqNumber": 706,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 211.72158813476562,
+        "seqNumber": 707,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 211.72244262695312,
+        "seqNumber": 708,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 212.39968872070312,
+        "seqNumber": 709,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (77 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 212.725830078125,
+        "seqNumber": 710,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 212.72647094726562,
+        "seqNumber": 711,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 213.74075317382812,
+        "seqNumber": 712,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 213.74127197265625,
+        "seqNumber": 713,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 214.7437744140625,
+        "seqNumber": 714,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 214.74444580078125,
+        "seqNumber": 715,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 215.76068115234375,
+        "seqNumber": 716,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 215.76132202148438,
+        "seqNumber": 717,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 215.87899780273438,
+        "seqNumber": 718,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (77 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 216.76089477539062,
+        "seqNumber": 719,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick Button 8 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 216.761474609375,
+        "seqNumber": 720,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick Button 8 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 217.76119995117188,
+        "seqNumber": 721,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 217.76214599609375,
+        "seqNumber": 722,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 218.7615966796875,
+        "seqNumber": 723,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 218.76223754882812,
+        "seqNumber": 724,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 218.88119506835938,
+        "seqNumber": 725,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (77 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 219.76535034179688,
+        "seqNumber": 726,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 219.76666259765625,
+        "seqNumber": 727,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "messageType": 2,
+        "timestamp": -0.000030517578125,
+        "seqNumber": 728,
+        "line": "********** Robot program starting **********"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.026214599609375,
+        "seqNumber": 729,
+        "line": "NT: Listening on NT3 port 1735, NT4 port 5810"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.261749267578125,
+        "seqNumber": 730,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 62549"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.263885498046875,
+        "seqNumber": 731,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 55900"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.26513671875,
+        "seqNumber": 732,
+        "line": "NT: CONNECTED NT4 client 'Elastic@1' (from 10.43.60.201:62549)"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.282928466796875,
+        "seqNumber": 733,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 60536"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.374481201171875,
+        "seqNumber": 734,
+        "line": "NT: Got a NT4 connection from 10.43.60.200 port 37304"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.375701904296875,
+        "seqNumber": 735,
+        "line": "NT: CONNECTED NT4 client 'photonvision@2' (from 10.43.60.200:37304)"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.46466064453125,
+        "seqNumber": 736,
+        "line": "DataLog: Logging to '/home/lvuser/logs/FRC_TBD_5d5e18ebe36ac983.wpilog' (73.2 MiB free space)"
+    },
+    {
+        "timestamp": 0.537872314453125,
+        "seqNumber": 737,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "DataLogManager: Log storage device has 76 MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.",
+        "location": "edu.wpi.first.wpilibj.DataLogManager.logMain(DataLogManager.java:346)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.53851318359375,
+        "seqNumber": 738,
+        "line": "Warning at edu.wpi.first.wpilibj.DataLogManager.logMain(DataLogManager.java:346): DataLogManager: Log storage device has 76 MB of free space remaining! Logs will get deleted below 50 MB of free space. Consider deleting logs off the storage device."
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.550048828125,
+        "seqNumber": 739,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 53178"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.5633544921875,
+        "seqNumber": 740,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 53775"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.681121826171875,
+        "seqNumber": 741,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 51829"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.68206787109375,
+        "seqNumber": 742,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 62548"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.789215087890625,
+        "seqNumber": 743,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 60544"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.79205322265625,
+        "seqNumber": 744,
+        "line": "NT: CONNECTED RTT client (from 10.43.60.201:60544)"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.846435546875,
+        "seqNumber": 745,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 54279"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 0.84783935546875,
+        "seqNumber": 746,
+        "line": "NT: CONNECTED NT4 client 'AdvantageScope@3' (from 10.43.60.201:54279)"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 1.10528564453125,
+        "seqNumber": 747,
+        "line": "NT: Got a NT4 connection from 10.43.60.201 port 49437"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 1.10601806640625,
+        "seqNumber": 748,
+        "line": "NT: CONNECTED RTT client (from 10.43.60.201:49437)"
+    },
+    {
+        "timestamp": 2.112762451171875,
+        "seqNumber": 749,
+        "numOccur": 1,
+        "errorCode": -10024,
+        "flags": 1,
+        "details": "Using a Pro only feature on an unlicensed device. The device may not behave as expected if it continues to operate while unlicensed.",
+        "location": "talon fx 4 (\"\") Apply Config",
+        "callStack": "com.ctre.phoenix6.jni.ErrorReportingJNI.reportStatusCode(Native Method)\ncom.ctre.phoenix6.configs.ParentConfigurator.setConfigsPrivate(ParentConfigurator.java:87)\ncom.ctre.phoenix6.configs.TalonFXConfigurator.apply(TalonFXConfigurator.java:84)\ncom.ctre.phoenix6.configs.TalonFXConfigurator.apply(TalonFXConfigurator.java:71)\ncom.ctre.phoenix6.swerve.SwerveModule.<init>(SwerveModule.java:599)\ncom.ctre.phoenix6.swerve.SwerveDrivetrain.<init>(SwerveDrivetrain.java:461)\ncom.ctre.phoenix6.swerve.SwerveDrivetrain.<init>(SwerveDrivetrain.java:322)\nfrc.robot.util.TunerConstants$TunerSwerveDrivetrain.<init>(TunerConstants.java:244)\nfrc.robot.subsystems.CommandSwerveDrivetrain.<init>(CommandSwerveDrivetrain.java:77)\nfrc.robot.util.TunerConstants.createDrivetrain(TunerConstants.java:220)\nfrc.robot.RobotContainer.<init>(RobotContainer.java:72)\nfrc.robot.Robot.<init>(Robot.java:42)\nedu.wpi.first.wpilibj.RobotBase.runRobot(RobotBase.java:387)\nedu.wpi.first.wpilibj.RobotBase.startRobot(RobotBase.java:527)\nfrc.robot.Main.main(Main.java:23)\n",
+        "messageType": 0
+    },
+    {
+        "messageType": 2,
+        "timestamp": 2.167449951171875,
+        "seqNumber": 750,
+        "line": "Talon ID 4 failed config with error: UsingProFeatureOnUnlicensedDevice"
+    },
+    {
+        "timestamp": 2.959930419921875,
+        "seqNumber": 751,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (76 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 2.96136474609375,
+        "seqNumber": 752,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger Started (Network: rio)",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 3.071807861328125,
+        "seqNumber": 753,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "StatusLogger: It is not recommended to log to RoboRIO internal storage. Plug in a flash drive.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 3.073028564453125,
+        "seqNumber": 754,
+        "line": "StatusLogger: Logging REVLOG to '/home/lvuser/logs/REV_TBD_101589035a5d7800.revlog'"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 3.0826416015625,
+        "seqNumber": 755,
+        "line": "StatusLogger: Renamed REVLOG from 'REV_TBD_101589035a5d7800.revlog' to 'REV_20260306_014037.revlog' at '/home/lvuser/logs/REV_20260306_014037.revlog'"
+    },
+    {
+        "timestamp": 3.08416748046875,
+        "seqNumber": 756,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "StatusLogger: Log storage device has 76 MB of free space remaining. REVLOGs will get deleted below 50 MB of free space. Consider deleting logs off the storage device.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 4.486236572265625,
+        "seqNumber": 757,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Library initialization is complete.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 5.967987060546875,
+        "seqNumber": 758,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (76 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 6.53204345703125,
+        "seqNumber": 759,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix-diagnostics] Server 2026.1.0 (Jan  7 2026, 19:24:14) running on port: 1250",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 7.40838623046875,
+        "seqNumber": 760,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick Button 8 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 7.409088134765625,
+        "seqNumber": 761,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick Button 8 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 7.617401123046875,
+        "seqNumber": 762,
+        "line": "********** Robot program startup complete **********"
+    },
+    {
+        "timestamp": 7.6546630859375,
+        "seqNumber": 763,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Loop time of 0.02s overrun\n",
+        "location": "edu.wpi.first.wpilibj.IterativeRobotBase.printLoopOverrunMessage(IterativeRobotBase.java:436)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 7.6561279296875,
+        "seqNumber": 764,
+        "line": "Warning at edu.wpi.first.wpilibj.IterativeRobotBase.printLoopOverrunMessage(IterativeRobotBase.java:436): Loop time of 0.02s overrun"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 7.65765380859375,
+        "seqNumber": 765,
+        "line": ""
+    },
+    {
+        "timestamp": 8.169952392578125,
+        "seqNumber": 766,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "PhotonVision coprocessor at path /photonvision/FRcamera is not connected to the TimeSyncServer? It's been 9223372036854.78s since the coprocessor last heard a pong.\n\nCheck /photonvision/.timesync/{COPROCESSOR_HOSTNAME} for more information.",
+        "location": "org.photonvision.PhotonCamera.checkTimeSyncOrWarn(PhotonCamera.java:364)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.170501708984375,
+        "seqNumber": 767,
+        "line": "Warning at org.photonvision.PhotonCamera.checkTimeSyncOrWarn(PhotonCamera.java:364): PhotonVision coprocessor at path /photonvision/FRcamera is not connected to the TimeSyncServer? It's been 9223372036854.78s since the coprocessor last heard a pong."
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.17156982421875,
+        "seqNumber": 768,
+        "line": ""
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.172210693359375,
+        "seqNumber": 769,
+        "line": "Check /photonvision/.timesync/{COPROCESSOR_HOSTNAME} for more information."
+    },
+    {
+        "timestamp": 8.235107421875,
+        "seqNumber": 770,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "PhotonVision coprocessor at path /photonvision/FLcamera is not connected to the TimeSyncServer? It's been 9223372036854.78s since the coprocessor last heard a pong.\n\nCheck /photonvision/.timesync/{COPROCESSOR_HOSTNAME} for more information.",
+        "location": "org.photonvision.PhotonCamera.checkTimeSyncOrWarn(PhotonCamera.java:364)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.235626220703125,
+        "seqNumber": 771,
+        "line": "Warning at org.photonvision.PhotonCamera.checkTimeSyncOrWarn(PhotonCamera.java:364): PhotonVision coprocessor at path /photonvision/FLcamera is not connected to the TimeSyncServer? It's been 9223372036854.78s since the coprocessor last heard a pong."
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.23583984375,
+        "seqNumber": 772,
+        "line": ""
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.236083984375,
+        "seqNumber": 773,
+        "line": "Check /photonvision/.timesync/{COPROCESSOR_HOSTNAME} for more information."
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.26361083984375,
+        "seqNumber": 774,
+        "line": "CommandScheduler loop overrun"
+    },
+    {
+        "timestamp": 8.30438232421875,
+        "seqNumber": 775,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "\tShootOnTheFlyCalculatorSubsystem.periodic(): 0.339317s\n\tKickerSubsystem.periodic(): 0.000464s\n\tIntakeSubsystem.periodic(): 0.037397s\n\tElasticSubsystem.periodic(): 0.009980s\n\tCommandSwerveDrivetrain.periodic(): 0.170975s\n\tbuttons.run(): 0.014784s\n\tMidtakeSubsystem.periodic(): 0.000482s\n\tShooterSubsystem.periodic(): 0.057542s\n\tDriveSubsystem.periodic(): 0.006641s\n",
+        "location": "edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:62)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.304931640625,
+        "seqNumber": 776,
+        "line": "Warning at edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:62): \tShootOnTheFlyCalculatorSubsystem.periodic(): 0.339317s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.306610107421875,
+        "seqNumber": 777,
+        "line": "\tKickerSubsystem.periodic(): 0.000464s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.307861328125,
+        "seqNumber": 778,
+        "line": "\tIntakeSubsystem.periodic(): 0.037397s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.308258056640625,
+        "seqNumber": 779,
+        "line": "\tElasticSubsystem.periodic(): 0.009980s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.310699462890625,
+        "seqNumber": 780,
+        "line": "\tCommandSwerveDrivetrain.periodic(): 0.170975s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.31268310546875,
+        "seqNumber": 781,
+        "line": "\tbuttons.run(): 0.014784s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.313446044921875,
+        "seqNumber": 782,
+        "line": "\tMidtakeSubsystem.periodic(): 0.000482s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.314117431640625,
+        "seqNumber": 783,
+        "line": "\tShooterSubsystem.periodic(): 0.057542s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.3143310546875,
+        "seqNumber": 784,
+        "line": "\tDriveSubsystem.periodic(): 0.006641s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.31451416015625,
+        "seqNumber": 785,
+        "line": ""
+    },
+    {
+        "timestamp": 8.347930908203125,
+        "seqNumber": 786,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "\tSmartDashboard.updateValues(): 0.002486s\n\tdisabledInit(): 0.002671s\n\trobotPeriodic(): 0.696812s\n\tLiveWindow.updateValues(): 0.002263s\n\tShuffleboard.update(): 0.000093s\n\tdisabledPeriodic(): 0.001039s\n",
+        "location": "edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:62)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.349273681640625,
+        "seqNumber": 787,
+        "line": "Warning at edu.wpi.first.wpilibj.Tracer.lambda$printEpochs$0(Tracer.java:62): \tSmartDashboard.updateValues(): 0.002486s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.349517822265625,
+        "seqNumber": 788,
+        "line": "\tdisabledInit(): 0.002671s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.349945068359375,
+        "seqNumber": 789,
+        "line": "\trobotPeriodic(): 0.696812s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.350372314453125,
+        "seqNumber": 790,
+        "line": "\tLiveWindow.updateValues(): 0.002263s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.3505859375,
+        "seqNumber": 791,
+        "line": "\tShuffleboard.update(): 0.000093s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.350799560546875,
+        "seqNumber": 792,
+        "line": "\tdisabledPeriodic(): 0.001039s"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.350982666015625,
+        "seqNumber": 793,
+        "line": ""
+    },
+    {
+        "timestamp": 8.422943115234375,
+        "seqNumber": 794,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 8.42352294921875,
+        "seqNumber": 795,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 8.978302001953125,
+        "seqNumber": 796,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (76 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 9.452239990234375,
+        "seqNumber": 797,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 9.452850341796875,
+        "seqNumber": 798,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "messageType": 2,
+        "timestamp": 9.743133544921875,
+        "seqNumber": 799,
+        "line": "DataLog: Renamed log file from 'FRC_TBD_5d5e18ebe36ac983.wpilog' to 'FRC_20260306_014043.wpilog'"
+    },
+    {
+        "timestamp": 10.4615478515625,
+        "seqNumber": 800,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 10.462066650390625,
+        "seqNumber": 801,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 11.480865478515625,
+        "seqNumber": 802,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 11.481597900390625,
+        "seqNumber": 803,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 11.99298095703125,
+        "seqNumber": 804,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (76 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "timestamp": 12.481170654296875,
+        "seqNumber": 805,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 12.48187255859375,
+        "seqNumber": 806,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 13.499969482421875,
+        "seqNumber": 807,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick axis 3 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 13.50048828125,
+        "seqNumber": 808,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick axis 3 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 14.500762939453125,
+        "seqNumber": 809,
+        "numOccur": 1,
+        "errorCode": 1,
+        "flags": 0,
+        "details": "Joystick Button 8 on port 0 not available, check if controller is plugged in",
+        "location": "edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345)",
+        "callStack": "",
+        "messageType": 1
+    },
+    {
+        "messageType": 2,
+        "timestamp": 14.50140380859375,
+        "seqNumber": 810,
+        "line": "Warning at edu.wpi.first.wpilibj.DriverStation.reportJoystickUnpluggedWarning(DriverStation.java:1345): Joystick Button 8 on port 0 not available, check if controller is plugged in"
+    },
+    {
+        "timestamp": 14.996246337890625,
+        "seqNumber": 811,
+        "numOccur": 1,
+        "errorCode": 0,
+        "flags": 0,
+        "details": "[phoenix] Signal Logger: Available disk space (75 MB) is low; at 50 MB, old hoot logs will be deleted. Use Tuner X to download and delete hoot logs.",
+        "location": "",
+        "callStack": "",
+        "messageType": 1
+    }
+]

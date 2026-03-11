@@ -17,6 +17,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -100,7 +101,7 @@ public class RobotContainer {
                                                 .withSingleTagEstimation()
                                                 .withOffset(
                                                                 new Transform3d(
-                                                                                Units.inchesToMeters(-57),
+                                                                                Units.inchesToMeters(-10),
                                                                                 Units.inchesToMeters(-10),
                                                                                 0,
                                                                                 new Rotation3d(
@@ -160,20 +161,29 @@ public class RobotContainer {
                 driveController.pov(180).onTrue(new InstantCommand(() -> {
                         intakeSubsystem.setIntakePosition(IntakePosition.DEPLOYED);
                 }));
-                driveController.a().onTrue(new InstantCommand(() -> {
+
+                // ---------- Operator Controller ----------\\
+
+                operatorController.rightBumper().onTrue(new InstantCommand(() -> {
                         intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
                 })).onFalse(new InstantCommand(() -> {
                         intakeSubsystem.setIntakeSpeed(0);
                 }));
-                driveController.leftTrigger().onTrue(new InstantCommand(() -> {
-                        shooter.setTargetHoodAngle(50);
-                })).onFalse(new InstantCommand(() -> {
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+
+                operatorController.leftTrigger().onTrue(new InstantCommand(() -> {
+                        shooter.setTargetHoodAngle(40);
                 }));
-                driveController.leftBumper().onTrue(new InstantCommand(() -> {
+
+                operatorController.b().onTrue(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(0);
+                }));
+
+                operatorController.leftBumper().onTrue(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(4500);
+                        shooter.setShooterRPM(ShooterConstants.SHOOTER_MAX_RPM);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 20);
 
                 })).onFalse(new InstantCommand(() -> {
@@ -182,29 +192,44 @@ public class RobotContainer {
                         shooter.setShooterRPM(0);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                 }));
-
-                driveController.rightBumper()
+                operatorController.x().onTrue(new SequentialCommandGroup(
+                                new WaitUntilCommand(() -> {
+                                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                                        shooter.getHoodMotor().setVoltage(-1);
+                                        SmartDashboard.putNumber("hood_current",
+                                                        shooter.getHoodMotor().getOutputCurrent());
+                                        return Math.abs(shooter.getHoodMotor().getOutputCurrent()) > 22;
+                                }),
+                                new InstantCommand(() -> {
+                                        System.out.print("Reset Hood Angle!");
+                                        shooter.getHoodMotor().setVoltage(0);
+                                        shooter.getHoodMotor().getEncoder()
+                                                        .setPosition(ShooterConstants.MIN_HOOD_ANGLE / 360.0);
+                                })));
+                operatorController.rightTrigger()
                                 .whileTrue(new ParallelCommandGroup(
                                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
-                                new RepeatCommand(new SequentialCommandGroup(
-                                // new WaitUntilCommand(
-                                // new BooleanSupplier() {
-                                // @Override
-                                // public boolean getAsBoolean() {
-                                // return RobotBase.isReal()
-                                // ? shooter.isReadyToShoot() && otfSubsystem.isAngleWithinTolerance()
-                                // : true;
-                                // }
-                                // }),
-                                new ShootCommand(shooter, otfSubsystem),
-                                new InstantCommand(() -> {
-                                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                                        kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
-                                })
-                                // Add prep commands for shooting here...
-                                // new PrintCommand("Shooting!")
-                                ))
-                                ))
+                                                new RepeatCommand(new SequentialCommandGroup(
+                                                                // new WaitUntilCommand(
+                                                                // new BooleanSupplier() {
+                                                                // @Override
+                                                                // public boolean getAsBoolean() {
+                                                                // return RobotBase.isReal()
+                                                                // ? shooter.isReadyToShoot() &&
+                                                                // otfSubsystem.isAngleWithinTolerance()
+                                                                // : true;
+                                                                // }
+                                                                // }),
+                                                                new ShootCommand(shooter, otfSubsystem),
+                                                                new InstantCommand(() -> {
+                                                                        MTKESubsystem.setMidtakeSpeed(
+                                                                                        MidtakeConstants.MIDTAKE_SPEED);
+                                                                        kickerSubsystem.setKickerSpeed(
+                                                                                        KickerConstants.KICKER_SPEED);
+                                                                })
+                                                // Add prep commands for shooting here...
+                                                // new PrintCommand("Shooting!")
+                                                ))))
                                 .onFalse(new InstantCommand(() -> {
                                         drivetrain.applyRequest(getDefaultDriveCommand());
                                         MTKESubsystem.setMidtakeSpeed(0);
