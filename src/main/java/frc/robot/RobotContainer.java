@@ -319,6 +319,25 @@ public class RobotContainer {
                 return autoChooser.getSelected();
         }
 
+        public Pose2d getStartingPose() {
+                if (PhotonCameraContainer.has_multi) {
+                        return drivetrain.getPose2d();
+                } else {
+                        // Assume against alliance wall (hub center)
+                        Alliance alliance = FieldConstants.getAlliance();
+                        double x;
+                        Rotation2d rotation;
+                        if (alliance == Alliance.Red) {
+                                x = FieldConstants.FIELD_LENGTH - (frc.robot.Constants.RobotConstants.robotLengthMeters / 2.0);
+                                rotation = Rotation2d.fromDegrees(180);
+                        } else {
+                                x = frc.robot.Constants.RobotConstants.robotLengthMeters / 2.0;
+                                rotation = Rotation2d.fromDegrees(0);
+                        }
+                        return new Pose2d(x, FieldConstants.FIELD_WIDTH / 2.0, rotation);
+                }
+        }
+
         public void onTeleOP() {
                 drivetrain.setDefaultCommand(drivetrain.applyRequest(getDefaultDriveCommand()));
         }

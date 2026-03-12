@@ -40,6 +40,49 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class PoseConstants {
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
+        .loadField(AprilTagFields.kDefaultField);
+    public static final double kPositionStdDevX = 0.1;
+    public static final double kPositionStdDevY = 0.1;
+    public static final double kPositionStdDevTheta = 10;
+    public static final double kVisionStdDevY = 5;
+    public static final double kVisionStdDevX = 5;
+    public static final double kVisionStdDevTheta = 500;
+  }
+
+  public static final class FieldConstants {
+    public static final double GRAVITY = 9.81;
+    public static final double FIELD_LENGTH = PoseConstants.kAprilTagFieldLayout.getFieldLength();
+    public static final double FIELD_WIDTH = PoseConstants.kAprilTagFieldLayout.getFieldWidth();
+    public static final Translation3d topCenterPointBlue = new Translation3d(
+        PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47) / 2.0,
+        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
+        Units.inchesToMeters(72.0));
+
+    public static final Translation3d topCenterPointRed = new Translation3d(
+        PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() - Units.inchesToMeters(47) / 2.0,
+        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
+        Units.inchesToMeters(72.0));
+
+    public static Alliance getAlliance() {
+      if (DriverStation.getAlliance().isPresent()) {
+        return DriverStation.getAlliance().get();
+      }
+
+      return Alliance.Blue;
+    }
+
+    public static Pose3d getHubPosition() {
+      Alliance alliance = getAlliance();
+      if (alliance == Alliance.Red) {
+        return new Pose3d(topCenterPointRed, new Rotation3d());
+      } else {
+        return new Pose3d(topCenterPointBlue, new Rotation3d());
+      }
+    }
+  }
+
   public static class ControllerConstants {
     public static final int DRIVER_CONTROLLER_PORT = 0;
     public static final int OPERATOR_CONTROLLER_PORT = 1;
@@ -134,37 +177,6 @@ public final class Constants {
     public static final double MOMENT_OF_INERTIA = 1;
   }
 
-  public static final class FieldConstants {
-    public static final double GRAVITY = 9.81;
-    public static final double FIELD_LENGTH = PoseConstants.kAprilTagFieldLayout.getFieldLength();
-    public static final double FIELD_WIDTH = PoseConstants.kAprilTagFieldLayout.getFieldWidth();
-    public static final Translation3d topCenterPointBlue = new Translation3d(
-        PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47) / 2.0,
-        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
-        Units.inchesToMeters(72.0));
-
-    public static final Translation3d topCenterPointRed = new Translation3d(
-        PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() - Units.inchesToMeters(47) / 2.0,
-        PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
-        Units.inchesToMeters(72.0));
-
-    public static Alliance getAlliance() {
-      if (DriverStation.getAlliance().isPresent()) {
-        return DriverStation.getAlliance().get();
-      }
-
-      return Alliance.Blue;
-    }
-
-    public static Pose3d getHubPosition() {
-      Alliance alliance = getAlliance();
-      if (alliance == Alliance.Red) {
-        return new Pose3d(topCenterPointRed, new Rotation3d());
-      } else {
-        return new Pose3d(topCenterPointBlue, new Rotation3d());
-      }
-    }
-  }
 
   public static class SwerveModuleConstants {
     public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
@@ -228,14 +240,4 @@ public final class Constants {
         DriveConstants.KINEMATICS.getModules());
   }
 
-  public static final class PoseConstants {
-    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
-        .loadField(AprilTagFields.kDefaultField);
-    public static final double kPositionStdDevX = 0.1;
-    public static final double kPositionStdDevY = 0.1;
-    public static final double kPositionStdDevTheta = 10;
-    public static final double kVisionStdDevY = 5;
-    public static final double kVisionStdDevX = 5;
-    public static final double kVisionStdDevTheta = 500;
-  }
 }

@@ -93,6 +93,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    // Seed odometry from vision or alliance hub
+    m_robotContainer.drivetrain.resetPose(m_robotContainer.getStartingPose());
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
