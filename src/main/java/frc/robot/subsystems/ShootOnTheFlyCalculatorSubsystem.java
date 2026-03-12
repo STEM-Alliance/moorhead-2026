@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.util.AllianceFlipUtil;
 import frc.robot.util.BallConstants;
 import frc.robot.util.BallPhysics;
 import frc.robot.util.BallSimulator;

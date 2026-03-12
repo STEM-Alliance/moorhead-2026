@@ -11,7 +11,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.util.FlipUtil;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -195,7 +194,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
     
  public void configureAutoBuilder() {
-        FlipUtil.setFieldLength(frc.robot.Constants.FieldConstants.FIELD_LENGTH);
+        //FlipUtil.setFieldLength(frc.robot.Constants.FieldConstants.FIELD_LENGTH);
         try {
             AutoBuilder.configure(
                 this::getPose2d,   // Supplier of current robot pose
