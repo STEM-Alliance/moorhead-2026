@@ -84,8 +84,8 @@ public final class Constants {
     }
     public static final InterpolatingDoubleTreeMap SHOT_VELOCITY_TO_RPS = new InterpolatingDoubleTreeMap();
     static {
-            SHOT_VELOCITY_TO_RPS.put(2.177 * 0.5, 22.34);
-      SHOT_VELOCITY_TO_RPS.put(2.177, 49.0);
+            SHOT_VELOCITY_TO_RPS.put(2.177 * 0.5, 18.34);
+      SHOT_VELOCITY_TO_RPS.put(2.177, 44.0);
       SHOT_VELOCITY_TO_RPS.put(5.1985, 56.0);
       SHOT_VELOCITY_TO_RPS.put(7.244, 63.0);
     }

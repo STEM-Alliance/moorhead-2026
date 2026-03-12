@@ -13,6 +13,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class PhotonCameraContainer {
     private static ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
     public static int cameraCount = 0;
+    public static boolean has_multi = false;
 
     public static void addPhotonCamera(String name) {
         cameras.add(new VisionCamera(name));
@@ -25,7 +26,7 @@ public class PhotonCameraContainer {
     }
 
     public static void estimateVisionOdometry(CommandSwerveDrivetrain odometry) {
-
+        boolean is_multi = false;
         for (VisionCamera visionCamera : cameras) {
             if (visionCamera.isEnabled()) {
                 PhotonCamera camera = visionCamera.getPhotonCamera();
@@ -34,6 +35,7 @@ public class PhotonCameraContainer {
 
                 for (PhotonPipelineResult result : results) {
                     if (result.getMultiTagResult().isPresent()) {
+                        is_multi = true;
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
                         Pose2d pose = toPose2D(multiTagPose.plus(visionCamera.getCameraOffset()));
                         odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
@@ -57,7 +59,11 @@ public class PhotonCameraContainer {
             }
 
         }
+        has_multi = is_multi;
+    }
 
+    public static ArrayList<VisionCamera> getVisionCameras() {
+        return cameras;
     }
 
     public static Pose2d toPose2D(Transform3d pose) {
