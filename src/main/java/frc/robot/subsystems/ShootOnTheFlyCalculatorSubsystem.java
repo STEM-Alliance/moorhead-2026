@@ -141,7 +141,8 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         double offsetX = robotPose.getX() - targetPose.getX(); // Long Side
         double offsetY = robotPose.getY() - targetPose.getY(); // Short Side
 
-        return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX)) + Math.PI);
+        return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX)) + (FieldConstants.getAlliance() == Alliance.Blue ? Math.PI : 0
+        ));
     }
 
     public boolean isAngleWithinTolerance() {

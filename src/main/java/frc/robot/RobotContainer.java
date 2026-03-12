@@ -285,7 +285,7 @@ public class RobotContainer {
                                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
                                                 new RepeatCommand(
                                                                 new SequentialCommandGroup(
-                                                                                new WaitUntilCommand(1),
+                                                                                new WaitCommand(1),
                                                                                 new SequentialCommandGroup(
                                                                                                 new ShootCommand(
                                                                                                                 shooter,
