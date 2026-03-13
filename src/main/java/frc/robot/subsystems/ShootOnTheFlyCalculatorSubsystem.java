@@ -74,6 +74,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         nt.putValue("shot_pitch", NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
         nt.putValue("shot_speed", NetworkTableValue.makeDouble(shotSolution.launchSpeed()));
         nt.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
+        nt.putValue("is_aligned", NetworkTableValue.makeBoolean(isAngleWithinTolerance()));
         otfSolutionPublisher.set(effectiveTargetLocation);
 
         // counter++;
@@ -148,7 +149,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     public boolean isAngleWithinTolerance() {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
         nt.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
-        return angleOffset < 3.0 || Math.abs(360 - angleOffset) < 3.0;
+        return angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0;
     }
 
     public boolean isOTFSolution() {
