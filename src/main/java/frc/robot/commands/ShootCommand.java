@@ -52,8 +52,8 @@ public class ShootCommand extends Command {
     shooter.setShooterRPM(goal_rpm);
     shooter.setTargetHoodAngle(goal_pitch);
 
-    if (RobotBase.isSimulation()) {
-      shotReady = true;
+    if (RobotBase.isSimulation() && shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()) {
+        shotReady = true;
     } else if (shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()
         && shooter.isReadyToShoot()) {
       shotReady = true;

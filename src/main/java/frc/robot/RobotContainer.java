@@ -235,6 +235,12 @@ public class RobotContainer {
                         intakeSubsystem.setIntakeSpeed(0);
                 }));
 
+                operatorController.button(8).onTrue(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(0);
+                }));
+
                 operatorController.leftTrigger().onTrue(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
@@ -257,8 +263,8 @@ public class RobotContainer {
                 operatorController.leftBumper().onTrue(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(2500);
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 20);
+                        shooter.setShooterRPM(3500);
+                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
 
                 })).onFalse(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(0);
@@ -284,19 +290,18 @@ public class RobotContainer {
                                 .whileTrue(new ParallelCommandGroup(
                                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
                                                 new RepeatCommand(
-                                                                new SequentialCommandGroup(
-                                                                                new WaitCommand(1),
-                                                                                new SequentialCommandGroup(
-                                                                                                new ShootCommand(
-                                                                                                                shooter,
-                                                                                                                otfSubsystem),
-                                                                                                new InstantCommand(
+                                                                new ParallelCommandGroup(
+                                                                                new WaitCommand(1).andThen(new InstantCommand(
                                                                                                                 () -> {
                                                                                                                         MTKESubsystem.setMidtakeSpeed(
                                                                                                                                         MidtakeConstants.MIDTAKE_SPEED);
                                                                                                                         kickerSubsystem.setKickerSpeed(
                                                                                                                                         KickerConstants.KICKER_SPEED);
-                                                                                                                }))))))
+                                                                                                                })),
+                                                                                                new ShootCommand(
+                                                                                                                shooter,
+                                                                                                                otfSubsystem)
+                                                                                                ))))
                                 .onFalse(new InstantCommand(() -> {
                                         drivetrain.applyRequest(getDefaultDriveCommand());
                                         MTKESubsystem.setMidtakeSpeed(0);
@@ -347,10 +352,10 @@ public class RobotContainer {
                 return () -> drive
                                 .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
                                 .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
                                 .withRotationalRate(
                                                 -driveController.getRightX() * driveSubsystem.getSlewRateMultiplier()
                                                                 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
@@ -360,10 +365,10 @@ public class RobotContainer {
                 return () -> aimAtHub.withTargetDirection(otfSubsystem.getAimAngle())
                                 .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
                                 .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : 1))
+                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
                                 .withMaxAbsRotationalRate(0.25 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
 
         }
