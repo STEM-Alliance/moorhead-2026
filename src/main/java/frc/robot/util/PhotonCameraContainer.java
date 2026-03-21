@@ -13,7 +13,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 public class PhotonCameraContainer {
     private static ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
     public static int cameraCount = 0;
-    public static boolean has_multi = false;
+    public static boolean HAS_MULTI_TAG_ESTIMATE = false;
 
     public static void addPhotonCamera(String name) {
         cameras.add(new VisionCamera(name));
@@ -59,7 +59,7 @@ public class PhotonCameraContainer {
             }
 
         }
-        has_multi = is_multi;
+        HAS_MULTI_TAG_ESTIMATE = is_multi;
     }
 
     public static ArrayList<VisionCamera> getVisionCameras() {

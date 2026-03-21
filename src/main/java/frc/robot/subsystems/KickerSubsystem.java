@@ -32,6 +32,7 @@ public class KickerSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
+        nt.putValue("kicker_real_speed", NetworkTableValue.makeDouble(kicker.getEncoder().getVelocity()));
         nt.putValue("kicker_speed", NetworkTableValue.makeDouble(getKickerSpeed()));
     }
 

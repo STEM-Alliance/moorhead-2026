@@ -7,19 +7,25 @@
         {
           "type": "named",
           "data": {
-            "name": "Startup"
+            "name": "Intake Out"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftOut"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left In"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Find Camera"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
+            "name": "Intake In"
           }
         },
         {
@@ -31,7 +37,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

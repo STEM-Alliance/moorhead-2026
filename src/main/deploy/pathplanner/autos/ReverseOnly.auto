@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "ReverseOut"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Startup"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Find Camera"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 2.0
           }
         },
         {
@@ -31,7 +25,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

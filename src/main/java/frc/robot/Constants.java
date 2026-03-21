@@ -150,7 +150,7 @@ public final class Constants {
     public static final ProfiledPIDController PIVOT_CONTROLLER = new ProfiledPIDController(0.28, 0.0, 0.01, new Constraints(100, 100));
 
     public static final double INTAKE_SPEED = 0.4;
-    public static final double PIVOT_MIN = 11;
+    public static final double PIVOT_MIN = 10; 
     public static final double PIVOT_MAX = 22.5;
   }
 
@@ -158,7 +158,7 @@ public final class Constants {
     public static final int MIDTAKE_ROLLERS_PORT = 30;
     public static final boolean MIDTAKE_REVERSED = false;
 
-    public static final double MIDTAKE_SPEED = 0.4;
+    public static final double MIDTAKE_SPEED = 1;
 
   }
 
@@ -166,7 +166,7 @@ public final class Constants {
     public static final int KICKER_PORT = 40;
     public static final boolean KICKER_REVERSED = false;
 
-    public static final double KICKER_SPEED = 0.25;
+    public static final double KICKER_SPEED = 0.9;
   }
 
   public static class RobotConstants {

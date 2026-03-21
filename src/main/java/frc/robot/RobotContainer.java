@@ -94,8 +94,8 @@ public class RobotContainer {
         private final SwerveRequest.Idle idle = new SwerveRequest.Idle();
         private final SwerveRequest.SwerveDriveBrake xStance = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-                        .withDeadband(DriveConstants.MAX_ROBOT_VELOCITY * 0.1)
-                        .withRotationalDeadband(DriveConstants.MAX_ROBOT_RAD_VELOCITY * 0.1)
+                        .withDeadband(DriveConstants.MAX_ROBOT_VELOCITY * 0.01)
+                        .withRotationalDeadband(DriveConstants.MAX_ROBOT_RAD_VELOCITY * 0.01)
                         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
         private final SwerveRequest.FieldCentricFacingAngle aimAtHub = new SwerveRequest.FieldCentricFacingAngle()
@@ -139,49 +139,60 @@ public class RobotContainer {
                                                 .build());
 
                 // ---------- Commands ----------\\
-                NamedCommands.registerCommand("rotateSlow", new InstantCommand(() -> {
+                NamedCommands.registerCommand("Startup", new InstantCommand(() -> {
                         intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
                         MTKESubsystem.setMidtakeSpeed(0);
                         kickerSubsystem.setKickerSpeed(0);
-                        shooter.setShooterRPM(1000);
+                        shooter.setShooterRPM(1500);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-                        System.out.println("Slow");
-                        if (PhotonCameraContainer.has_multi == false) {
-                                drivetrain.setDefaultCommand(null);
-                                drivetrain.applyRequest(getRotateSlow()).execute();
-                        }
-                        // drivetrain.applyRequest(getRotateSlow());
+                        drivetrain.setDefaultCommand(null);
                 }));
-                NamedCommands.registerCommand("Position", new WaitUntilCommand(() -> {
-                        boolean foundCamera = PhotonCameraContainer.has_multi;
-                        boolean stoppedMoving = false;
 
-                        stoppedMoving = Math.abs(drivetrain.getChassisSpeeds().omegaRadiansPerSecond) <= 0.1;
+                NamedCommands.registerCommand("Find Camera", new SequentialCommandGroup(
+                                new InstantCommand(() -> {
+                                        if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE == false) {
+                                                drivetrain.applyRequest(getRotateSlow()).execute();
+                                        }
+                                }),
+                                new WaitUntilCommand(() -> {
+                                        if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE) {
+                                                drivetrain.applyRequest(() -> xStance).execute();
+                                                return true;
+                                        }
 
-                        if (foundCamera) {
-                                drivetrain.applyRequest(() -> xStance).execute();
-                                System.out.println("Found Camera!");
-                        } else {
-                                System.out.println("Found No Cameras!");
-                        }
+                                        return false;
+                                })));
 
-                        return foundCamera && stoppedMoving;
-                }));
                 NamedCommands.registerCommand("Shoot", new ParallelCommandGroup(
                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
-                                new WaitCommand(1).andThen(new InstantCommand(() -> {
+                                new WaitCommand(0.25).andThen(new InstantCommand(() -> {
                                         MTKESubsystem.setMidtakeSpeed(
                                                         MidtakeConstants.MIDTAKE_SPEED);
                                         kickerSubsystem.setKickerSpeed(
                                                         KickerConstants.KICKER_SPEED);
                                 })),
-                                new ShootCommand(shooter, otfSubsystem)));
+                                new ShootCommand(shooter, otfSubsystem)).withDeadline(new WaitCommand(4 )));
+
                 NamedCommands.registerCommand("Stop Shoot", new InstantCommand(() -> {
-                        drivetrain.applyRequest(getDefaultDriveCommand());
                         MTKESubsystem.setMidtakeSpeed(0);
                         kickerSubsystem.setKickerSpeed(0);
-                        shooter.setShooterRPM(1000);
+                        shooter.setShooterRPM(1500);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                }));
+
+                NamedCommands.registerCommand("Intake Out", new InstantCommand(() -> {
+                        intakeSubsystem.setIntakePosition(IntakePosition.DEPLOYED);
+                        intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
+                }));
+
+                NamedCommands.registerCommand("Intake In", new InstantCommand(() -> {
+                        intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
+                        intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
+                }));
+
+                NamedCommands.registerCommand("Intake In", new InstantCommand(() -> {
+                        intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
+                        intakeSubsystem.setIntakeSpeed(0);
                 }));
 
                 autoChooser = AutoBuilder.buildAutoChooser();
@@ -196,9 +207,11 @@ public class RobotContainer {
                                 .withVelocityY(0)
                                 .withRotationalRate(0.1 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
         }
+
         public void autonomousPeriodic() {
-                                        PhotonCameraContainer.estimateVisionOdometry(drivetrain);
+                PhotonCameraContainer.estimateVisionOdometry(drivetrain);
         }
+
         /**
          * Use this method to define your trigger->command mappings. Triggers can be
          * created via the
@@ -265,12 +278,13 @@ public class RobotContainer {
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
                         shooter.setShooterRPM(3500);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-
+                        intakeSubsystem.setShake(true);
                 })).onFalse(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(0);
                         MTKESubsystem.setMidtakeSpeed(0);
                         shooter.setShooterRPM(1000);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                        intakeSubsystem.setShake(false);
                 }));
                 operatorController.x().onTrue(new SequentialCommandGroup(
                                 new WaitUntilCommand(() -> {
@@ -291,17 +305,17 @@ public class RobotContainer {
                                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
                                                 new RepeatCommand(
                                                                 new ParallelCommandGroup(
-                                                                                new WaitCommand(1).andThen(new InstantCommand(
+                                                                                new WaitCommand(1).andThen(
+                                                                                                new InstantCommand(
                                                                                                                 () -> {
                                                                                                                         MTKESubsystem.setMidtakeSpeed(
                                                                                                                                         MidtakeConstants.MIDTAKE_SPEED);
                                                                                                                         kickerSubsystem.setKickerSpeed(
                                                                                                                                         KickerConstants.KICKER_SPEED);
                                                                                                                 })),
-                                                                                                new ShootCommand(
-                                                                                                                shooter,
-                                                                                                                otfSubsystem)
-                                                                                                ))))
+                                                                                new ShootCommand(
+                                                                                                shooter,
+                                                                                                otfSubsystem)))))
                                 .onFalse(new InstantCommand(() -> {
                                         drivetrain.applyRequest(getDefaultDriveCommand());
                                         MTKESubsystem.setMidtakeSpeed(0);
@@ -310,8 +324,7 @@ public class RobotContainer {
                                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                                 }));
 
-                // RobotModeTriggers.disabled().whileTrue(drivetrain.applyRequest(() ->
-                // idle).ignoringDisable(true));
+                RobotModeTriggers.disabled().whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
                 drivetrain.registerTelemetry(logger::telemeterize);
 
         }
@@ -326,7 +339,7 @@ public class RobotContainer {
         }
 
         public Pose2d getStartingPose() {
-                if (PhotonCameraContainer.has_multi) {
+                if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE) {
                         return drivetrain.getPose2d();
                 } else {
                         // Assume against alliance wall (hub center)
@@ -334,7 +347,8 @@ public class RobotContainer {
                         double x;
                         Rotation2d rotation;
                         if (alliance == Alliance.Red) {
-                                x = FieldConstants.FIELD_LENGTH - (frc.robot.Constants.RobotConstants.robotLengthMeters / 2.0);
+                                x = FieldConstants.FIELD_LENGTH
+                                                - (frc.robot.Constants.RobotConstants.robotLengthMeters / 2.0);
                                 rotation = Rotation2d.fromDegrees(180);
                         } else {
                                 x = frc.robot.Constants.RobotConstants.robotLengthMeters / 2.0;
@@ -345,6 +359,10 @@ public class RobotContainer {
         }
 
         public void onTeleOP() {
+                MTKESubsystem.setMidtakeSpeed(0);
+                kickerSubsystem.setKickerSpeed(0);
+                shooter.setShooterRPM(1000);
+                shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                 drivetrain.setDefaultCommand(drivetrain.applyRequest(getDefaultDriveCommand()));
         }
 
@@ -352,10 +370,10 @@ public class RobotContainer {
                 return () -> drive
                                 .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
+                                                * -1)
                                 .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
+                                                * -1)
                                 .withRotationalRate(
                                                 -driveController.getRightX() * driveSubsystem.getSlewRateMultiplier()
                                                                 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
@@ -365,10 +383,10 @@ public class RobotContainer {
                 return () -> aimAtHub.withTargetDirection(otfSubsystem.getAimAngle())
                                 .withVelocityX(driveController.getLeftY() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
+                                                * -1)
                                 .withVelocityY(driveController.getLeftX() * driveSubsystem.getSlewRateMultiplier()
                                                 * DriveConstants.MAX_ROBOT_VELOCITY
-                                                * (FieldConstants.getAlliance() == Alliance.Blue ? -1 : -1))
+                                                * -1)
                                 .withMaxAbsRotationalRate(0.25 * DriveConstants.MAX_ROBOT_RAD_VELOCITY);
 
         }
