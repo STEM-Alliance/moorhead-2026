@@ -92,6 +92,7 @@ public final class Constants {
     public static final int HOOD_MOTOR_PORT = 10;
     public static final int SHOOTER_LEADER_PORT = 11;
     public static final int SHOOTER_FOLLOWER_PORT = 12;
+    public static final int BEAM_BREAK_PORT = 999; // To Do: Set When Get
 
    public static final boolean SHOOTER_LEADER_INVERTED = false;
     public static final boolean SHOOTER_FOLLOWER_INVERTED = true;

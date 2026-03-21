@@ -227,80 +227,19 @@ public class RobotContainer {
          * joysticks}.
          */
         private void configureBindings() {
-                // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+                // Driver Controller
+
+                // Button 8 | Reset Orientation
 
                 driveController.button(8).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
+                // Button B | X-Stance (Stop Moving + Rotating Instantly)
+
                 driveController.b().onTrue(drivetrain.applyRequest(() -> xStance));
 
-                driveController.pov(0).onTrue(new InstantCommand(() -> {
-                        intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
-                }));
-                driveController.pov(180).onTrue(new InstantCommand(() -> {
-                        intakeSubsystem.setIntakePosition(IntakePosition.DEPLOYED);
-                }));
+                // Left Trigger | Auto Aim + Shoot
 
-                // ---------- Operator Controller ----------\\
-
-                operatorController.rightBumper().onTrue(new InstantCommand(() -> {
-                        intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
-                })).onFalse(new InstantCommand(() -> {
-                        intakeSubsystem.setIntakeSpeed(0);
-                }));
-
-                operatorController.button(8).onTrue(new InstantCommand(() -> {
-                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                })).onFalse(new InstantCommand(() -> {
-                        MTKESubsystem.setMidtakeSpeed(0);
-                }));
-
-                operatorController.leftTrigger().onTrue(new InstantCommand(() -> {
-                        kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
-                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(3000);
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 20);
-
-                })).onFalse(new InstantCommand(() -> {
-                        kickerSubsystem.setKickerSpeed(0);
-                        MTKESubsystem.setMidtakeSpeed(0);
-                        shooter.setShooterRPM(1000);
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-                }));
-
-                operatorController.b().onTrue(new InstantCommand(() -> {
-                        MTKESubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
-                })).onFalse(new InstantCommand(() -> {
-                        MTKESubsystem.setMidtakeSpeed(0);
-                }));
-
-                operatorController.leftBumper().onTrue(new InstantCommand(() -> {
-                        kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
-                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(3500);
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-                        intakeSubsystem.setShake(true);
-                })).onFalse(new InstantCommand(() -> {
-                        kickerSubsystem.setKickerSpeed(0);
-                        MTKESubsystem.setMidtakeSpeed(0);
-                        shooter.setShooterRPM(1000);
-                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-                        intakeSubsystem.setShake(false);
-                }));
-                operatorController.x().onTrue(new SequentialCommandGroup(
-                                new WaitUntilCommand(() -> {
-                                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
-                                        shooter.getHoodMotor().setVoltage(-1);
-                                        SmartDashboard.putNumber("hood_current",
-                                                        shooter.getHoodMotor().getOutputCurrent());
-                                        return Math.abs(shooter.getHoodMotor().getOutputCurrent()) > 22;
-                                }),
-                                new InstantCommand(() -> {
-                                        System.out.print("Reset Hood Angle!");
-                                        shooter.getHoodMotor().setVoltage(0);
-                                        shooter.getHoodMotor().getEncoder()
-                                                        .setPosition(ShooterConstants.MIN_HOOD_ANGLE / 360.0);
-                                })));
-                operatorController.rightTrigger()
+                driveController.leftTrigger()
                                 .whileTrue(new ParallelCommandGroup(
                                                 new RepeatCommand(drivetrain.applyRequest(getAimRequest())),
                                                 new RepeatCommand(
@@ -323,6 +262,96 @@ public class RobotContainer {
                                         shooter.setShooterRPM(1000);
                                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                                 }));
+
+                // ---------- Operator Controller ---------- \\
+
+                // D:Pad Up | Intake Position -> Stowed
+
+                operatorController.pov(0).onTrue(new InstantCommand(() -> {
+                        intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
+                }));
+
+                // D:Pad Down | Intake Position -> Deployed
+
+                operatorController.pov(180).onTrue(new InstantCommand(() -> {
+                        intakeSubsystem.setIntakePosition(IntakePosition.DEPLOYED);
+                }));
+
+                // Right Bumper | Intake
+
+                operatorController.rightBumper().onTrue(new InstantCommand(() -> {
+                        intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        intakeSubsystem.setIntakeSpeed(0);
+                }));
+
+                // Button 8 | Midtake Only
+
+                operatorController.button(8).onTrue(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(0);
+                }));
+
+                // Button B | Reverse Midtake
+
+                operatorController.b().onTrue(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(0);
+                }));
+
+                // Button A | Reverse Intake + Reverse Midtake
+
+                operatorController.a().onTrue(new InstantCommand(() -> {
+                        intakeSubsystem.setIntakeSpeed(-IntakeConstants.INTAKE_SPEED);
+                        MTKESubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
+                })).onFalse(new InstantCommand(() -> {
+                        MTKESubsystem.setMidtakeSpeed(0);
+                        intakeSubsystem.setIntakeSpeed(0);
+                }));
+
+                operatorController.leftBumper().onTrue(new InstantCommand(() -> {
+                        kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
+                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
+                        shooter.setShooterRPM(3500);
+                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                        intakeSubsystem.setShake(true);
+                })).onFalse(new InstantCommand(() -> {
+                        kickerSubsystem.setKickerSpeed(0);
+                        MTKESubsystem.setMidtakeSpeed(0);
+                        shooter.setShooterRPM(1000);
+                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                        intakeSubsystem.setShake(false);
+                }));
+
+                operatorController.leftTrigger().onTrue(new InstantCommand(() -> {
+                        kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
+                        MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
+                        shooter.setShooterRPM(4500);
+                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 20);
+                })).onFalse(new InstantCommand(() -> {
+                        kickerSubsystem.setKickerSpeed(0);
+                        MTKESubsystem.setMidtakeSpeed(0);
+                        shooter.setShooterRPM(1000);
+                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                }));
+
+                operatorController.x().onTrue(new SequentialCommandGroup(
+                                new WaitUntilCommand(() -> {
+                                        shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                                        shooter.getHoodMotor().setVoltage(-1);
+                                        SmartDashboard.putNumber("hood_current",
+                                                        shooter.getHoodMotor().getOutputCurrent());
+                                        return Math.abs(shooter.getHoodMotor().getOutputCurrent()) > 22;
+                                }),
+                                new InstantCommand(() -> {
+                                        System.out.print("Reset Hood Angle!");
+                                        shooter.getHoodMotor().setVoltage(0);
+                                        shooter.getHoodMotor().getEncoder()
+                                                        .setPosition(ShooterConstants.MIN_HOOD_ANGLE / 360.0);
+                                })));
+                
 
                 RobotModeTriggers.disabled().whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
                 drivetrain.registerTelemetry(logger::telemeterize);

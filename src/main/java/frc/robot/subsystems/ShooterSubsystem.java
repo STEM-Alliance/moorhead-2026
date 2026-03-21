@@ -17,22 +17,31 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
 
 public class ShooterSubsystem extends SubsystemBase {
     private final SparkFlex shooterLeader;
     private final SparkFlex shooterFollower;
     private final SparkMax hoodMotor;
+    private final DigitalInput beamBreak;
 
     private final SparkClosedLoopController shooterClosedLoop;
 
     private double targetHoodAngle = 0.0;
     private double targetRPM = 0.0;
+    private int ballsShot = 0;
+    private Trigger ballsTrigger;
+    private boolean wasBeamBreakBroken = false;
 
     private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("shooter");
 
     public ShooterSubsystem() {
+        beamBreak = new DigitalInput(ShooterConstants.BEAM_BREAK_PORT);
+        // Beam Break is false when not broken?
+        ballsTrigger = new Trigger(() -> !beamBreak.get());
         shooterLeader = new SparkFlex(ShooterConstants.SHOOTER_LEADER_PORT, MotorType.kBrushless);
         shooterFollower = new SparkFlex(ShooterConstants.SHOOTER_FOLLOWER_PORT, MotorType.kBrushless);
 
@@ -80,6 +89,7 @@ public class ShooterSubsystem extends SubsystemBase {
         nt.putValue("leader_temp", NetworkTableValue.makeDouble(shooterLeader.getMotorTemperature()));
         nt.putValue("follower_temp", NetworkTableValue.makeDouble(shooterFollower.getMotorTemperature()));
         nt.putValue("hood_current", NetworkTableValue.makeDouble(hoodMotor.getOutputCurrent()));
+        nt.putValue("balls_shot", NetworkTableValue.makeInteger(ballsShot));
         targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.MIN_HOOD_ANGLE,
                 ShooterConstants.HOOD_MAX_ANGLE + ShooterConstants.MIN_HOOD_ANGLE);
 
@@ -87,7 +97,18 @@ public class ShooterSubsystem extends SubsystemBase {
         double hoodOutput = -ShooterConstants.HOOD_PID.calculate(targetHoodAngle, getHoodAngle());
         hoodMotor.set(hoodOutput);
         nt.putValue("hood_output", NetworkTableValue.makeDouble(hoodOutput));
+        // Was Broken, Is 
+        if (wasBeamBreakBroken && !isBeamBroken()) {
+            wasBeamBreakBroken = false;
+            ballsShot++;
+        } else if (isBeamBroken()) {
+            wasBeamBreakBroken = true;
+        }
 
+    }
+
+    public boolean isBeamBroken() {
+        return !beamBreak.get();
     }
 
     public void setTargetHoodAngle(double target) {
