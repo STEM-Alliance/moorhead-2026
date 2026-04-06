@@ -34,7 +34,11 @@ public class LEDSubsystem extends SubsystemBase {
     public void setLEDStyle(LedStyle style) {
         this.LEDStyle = style;
     }
-
+    public void LEDBalls(int nBalls){
+        if (nBalls == 1){
+            
+        }
+    }
     @Override
     public void periodic() {
         this.LEDspark.set(LEDStyle.getSpeed());
