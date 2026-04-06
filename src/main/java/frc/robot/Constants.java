@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.fasterxml.jackson.databind.ser.std.StdKeySerializers.Default;
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
@@ -11,8 +12,9 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -21,6 +23,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -38,66 +41,55 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static class ControllerConstants {
-    public static final int DRIVER_CONTROLLER_PORT = 0;
-    public static final int OPERATOR_CONTROLLER_PORT = 1;
-  }
-  public static class ShooterConstants {
-    public static final int HOOD_MOTOR_PORT = 100; //1
-    public static final int SHOOTER_LEADER_PORT = 200; //2
-    public static final int SHOOTER_FOLLOWER_PORT = 254;  //3
-
-    public static final boolean SHOOTER_LEADER_INVERTED = true;
-    public static final boolean SHOOTER_FOLLOWER_INVERTED = true;
-    public static final boolean HOOD_INVERTED = false;
-    public static final double SHOOTER_MAX_RPM = 6500.0;
-    public static final double SHOOTER_IDLE_RPM = 100.0;
-
-    public static final double HOOD_GEAR_RATIO = (12d / 48d) * (18d / 310d);
-    public static final double HOOD_MIN_ANGLE = 32.982;
-    public static final double HOOD_MAX_ANGLE = 72.982;
-
-    public static final double SHOOTER_P = 0.0006;
-    public static final double SHOOTER_I = 0.000;
-    public static final double SHOOTER_D = 0.00001;
-
-    public static final PIDController HOOD_PID = new PIDController(0.0, 0.0, 0.0);
-
-  }
-  public static class RobotConstants {
-    public static final double robotWidthMeters = Units.inchesToMeters(25.0);
-    public static final double robotLengthMeters = Units.inchesToMeters(25.0);
-
-    // TODO: ############## REPLACE PLACEHOLDERS ##############
-    public static final double TOTAL_MASS_KG = 10;
-    public static final double MOMENT_OF_INERTIA = 1;
+  public static final class PoseConstants {
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
+        .loadField(AprilTagFields.kDefaultField);
+    public static final double kPositionStdDevX = 0.1;
+    public static final double kPositionStdDevY = 0.1;
+    public static final double kPositionStdDevTheta = 10;
+    public static final double kVisionStdDevY = 5;
+    public static final double kVisionStdDevX = 5;
+    public static final double kVisionStdDevTheta = 500;
   }
 
   public static final class FieldConstants {
     public static final double GRAVITY = 9.81;
-
-    public static final InterpolatingDoubleTreeMap DISTANCE_TO_SHOT_SPEED = new InterpolatingDoubleTreeMap();
-        static {
-            DISTANCE_TO_SHOT_SPEED.put(2.07, 7.0);
-            // DISTANCE_TO_SHOT_SPEED.put(2.41, 41.0);
-            // DISTANCE_TO_SHOT_SPEED.put(3.20, 45.0);
-            // DISTANCE_TO_SHOT_SPEED.put(3.87, 49.0);
-            // DISTANCE_TO_SHOT_SPEED.put(4.57, 52.0);
-            DISTANCE_TO_SHOT_SPEED.put(4.92, 9.0);
-            // DISTANCE_TO_SHOT_SPEED.put(0.0, 7.0);
-            // DISTANCE_TO_SHOT_SPEED.put(5.0, 8.25);
-            // DISTANCE_TO_SHOT_SPEED.put(10.0, 10.0);
-        }
-
+    public static final double FIELD_LENGTH = PoseConstants.kAprilTagFieldLayout.getFieldLength();
+    public static final double FIELD_WIDTH = PoseConstants.kAprilTagFieldLayout.getFieldWidth();
     public static final Translation3d topCenterPointBlue = new Translation3d(
         PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() + Units.inchesToMeters(47) / 2.0,
         PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
         Units.inchesToMeters(72.0));
 
-      public static final Translation3d topCenterPointRed =  new Translation3d(
+    public static final Translation3d topCenterPointRed = new Translation3d(
         PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() - Units.inchesToMeters(47) / 2.0,
         PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 2.0,
         Units.inchesToMeters(72.0));
+
+    public static Translation2d[] getFieldPoints() {
+      switch (getAlliance()) {
+        case Blue -> {
+          return new Translation2d[] {
+              new Translation2d(
+                  PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() - PoseConstants.kAprilTagFieldLayout.getFieldLength() / 8.0,
+                  PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 4.0),
+              new Translation2d(
+                  PoseConstants.kAprilTagFieldLayout.getTagPose(26).get().getX() - PoseConstants.kAprilTagFieldLayout.getFieldLength() / 8.0,
+                  (PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 4.0) * 3)
+          };
+        }
+        default -> {
+          return new Translation2d[] {
+              new Translation2d(
+                  PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() + PoseConstants.kAprilTagFieldLayout.getFieldLength() / 8.0,
+                  PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 4.0),
+              new Translation2d(
+                  PoseConstants.kAprilTagFieldLayout.getTagPose(9).get().getX() + PoseConstants.kAprilTagFieldLayout.getFieldLength() / 8.0,
+                  (PoseConstants.kAprilTagFieldLayout.getFieldWidth() / 4.0) * 3)
+          };
+        }
+      }
+    }
 
     public static Alliance getAlliance() {
       if (DriverStation.getAlliance().isPresent()) {
@@ -117,65 +109,123 @@ public final class Constants {
     }
   }
 
-  public static class SwerveModuleConstants {
-    public static final int PIGEON_ID = 6;
+  public static class ControllerConstants {
+    public static final int DRIVER_CONTROLLER_PORT = 0;
+    public static final int OPERATOR_CONTROLLER_PORT = 1;
+  }
 
-    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
-    public static final double STEERING_GEAR_RATIO = 11.d / (287d);
-    public static final double DRIVE_GEAR_RATIO = (1.d / 6.03d);
+  public static class ShooterConstants {
+    public static final int HOOD_MOTOR_PORT = 10;
+    public static final int SHOOTER_LEADER_PORT = 11;
+    public static final int SHOOTER_FOLLOWER_PORT = 12;
+    public static final int BEAM_BREAK_PORT = 0; // To Do: Set When Get
 
-    public static final double DRIVE_ROTATION_TO_METER = DRIVE_GEAR_RATIO * Math.PI * WHEEL_DIAMETER;
-    public static final double STEER_ROTATION_TO_RADIANS = STEERING_GEAR_RATIO * Math.PI * 2d;
-    public static final double DRIVE_METERS_PER_MINUTE = DRIVE_ROTATION_TO_METER / 60d;
-    public static final double STEER_RADIANS_PER_MINUTE = STEER_ROTATION_TO_RADIANS / 60d;
+    public static final boolean SHOOTER_LEADER_INVERTED = false;
+    public static final boolean SHOOTER_FOLLOWER_INVERTED = true;
+    public static final boolean HOOD_INVERTED = false;
+    public static final double SHOOTER_MAX_RPM = 6500.0;
+    public static final double SHOOTER_IDLE_RPM = 2000.0;
 
-    // TODO: ############## REPLACE PLACEHOLDERS ##############
-    public static final double WHEEL_FRICTION_COEFFICIENT = 1.2;
+    public static final double HOOD_GEAR_RATIO = (12d / 48d) * (18d / 310d);
+    public static final double HOOD_MAX_ANGLE = 32.982;
+    public static final double MIN_HOOD_ANGLE = 25.819244; // degrees
 
-    // Actual drive gains
-    // public static final double MODULE_KP = 0.5;
-    // public static final double MODULE_KD = 0.03;
+    public static final double SHOOTER_P = 0.00;
+    public static final double SHOOTER_I = 0.0000001;
+    public static final double SHOOTER_D = 0.0000;
 
-    // NOTE: This may need additional tuning!
-    public static final double MODULE_KP = 0.2;// 0.75628;// 0.7491; //.5;
-    public static final double MODULE_KD = 0.000;// 0.0057682; //0.0076954;
+    public static final double SHOOTER_kV = 0.0015;
+    public static final double SHOOTER_kA = 0;
 
-    // --------- Front Left Module --------- \\
-    public static final int FL_DRIVE_ID = 3;
-    public static final int FL_STEER_ID = 4;
-    public static final int FL_ABSOLUTE_ENCODER_PORT = 1;
-    public static final double FL_OFFSET_RADIANS = Units.rotationsToRadians(-0.24169921875);
-    public static final boolean FL_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean FL_MOTOR_REVERSED = false;
+    public static final PIDController HOOD_PID = new PIDController(0.0165, 0.0, 0.0001);
 
-    // --------- Front Right Module --------- \\
-    public static final int FR_DRIVE_ID = 1;
-    public static final int FR_STEER_ID = 2;
-    public static final int FR_ABSOLUTE_ENCODER_PORT = 2;
-    public static final double FR_OFFSET_RADIANS = Units.rotationsToRadians(-0.094482421875);
-    public static final boolean FR_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean FR_MOTOR_REVERSED = false;
+    public static final InterpolatingDoubleTreeMap DISTANCE_TO_SHOOT_VELOCITY = new InterpolatingDoubleTreeMap();
+    static {
+      // DISTANCE_TO_SHOT_SPEED.put(2.07, 7.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(2.41, 41.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(3.20, 45.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(3.87, 49.0);
+      // // DISTANCE_TO_SHOT_SPEED.put(4.57, 52.0);
+      // DISTANCE_TO_SHOT_SPEED.put(4.92, 9.0);
 
-    // --------- Back Right Module --------- \\
-    public static final int BR_DRIVE_ID = 7;
-    public static final int BR_STEER_ID = 8;
-    public static final int BR_ABSOLUTE_ENCODER_PORT = 3;
-    public static final double BR_OFFSET_RADIANS = Units.rotationsToRadians(-0.036865234375);
-    public static final boolean BR_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean BR_MOTOR_REVERSED = false;
+      // DISTANCE_TO_SHOT_SPEED.put(7.583,15.872);
+      DISTANCE_TO_SHOOT_VELOCITY.put(Units.feetToMeters(7.41), 2.4);
+      DISTANCE_TO_SHOOT_VELOCITY.put(Units.feetToMeters(17.58), 5.19);
+      // DISTANCE_TO_SHOT_SPEED.put(22.583,37.5);
+    }
+    public static final InterpolatingDoubleTreeMap SHOT_VELOCITY_TO_RPS = new InterpolatingDoubleTreeMap();
+    static {
+      SHOT_VELOCITY_TO_RPS.put(2.177 * 0.5, 18.34);
+      SHOT_VELOCITY_TO_RPS.put(2.177, 44.0);
+      SHOT_VELOCITY_TO_RPS.put(5.1985, 56.0);
+      SHOT_VELOCITY_TO_RPS.put(7.244, 63.0);
+    }
+    public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
+    public static final double INCOMMING_SHOT_ANGLE = -50;
 
-    // --------- Back Left Module --------- \\
-    public static final int BL_DRIVE_ID = 5;
-    public static final int BL_STEER_ID = 6;
-    public static final int BL_ABSOLUTE_ENCODER_PORT = 4;
-    public static final double BL_OFFSET_RADIANS = Units.rotationsToRadians(0.124755859375);
-    public static final boolean BL_ABSOLUTE_ENCODER_REVERSED = false;
-    public static final boolean BL_MOTOR_REVERSED = false;
+    public static class ShotRegressionCoefficients {
+      public static double linear(double velocity) {
+        return ((0.351204 * velocity) + 0.300) * 1000d;
+      }
+
+      public static double exponential(double velocity) {
+        return (1000d * (1.17689 * Math.pow(1.10973, velocity))) + 400d;
+      }
+
+      public static double cubic(double velocity) {
+        return (((0.00150004 * (velocity * velocity * velocity))
+            - (0.0347092 * (velocity * velocity))
+            + (0.577971 * velocity)
+            - 0.392866) * 1000d) + 400;
+      }
+    }
+  }
+
+  public static final class IntakeConstants {
+    public static final int INTAKE_ROLLER_PORT = 22;
+    public static final int INTAKE_PIVOT_PORT = 21;
+
+    public static final double INTAKE_PIVOT_RATIO = (1.0 / 10.0);
+
+    public static final boolean INTAKE_REVERSED = true;
+    public static final boolean INTAKE_PIVOT_REVERSED = false;
+
+    public static final ArmFeedforward PIVOT_FEEDFORWARD = new ArmFeedforward(0.41, 6.1, 0.06);
+
+    public static final ProfiledPIDController PIVOT_CONTROLLER = new ProfiledPIDController(0.28, 0.0, 0.01,
+        new Constraints(100, 100));
+
+    public static final double INTAKE_SPEED = 0.4;
+    public static final double PIVOT_MIN = 10;
+    public static final double PIVOT_MAX = 22.5;
+  }
+
+  public static final class MidtakeConstants {
+    public static final int MIDTAKE_ROLLERS_PORT = 30;
+    public static final boolean MIDTAKE_REVERSED = true;
+
+    public static final double MIDTAKE_SPEED = 1;
 
   }
 
-  public static class AimbotConstants {
-    public static final PIDController pidController = new PIDController(0.05, 0.0, 0.0012);
+  public static final class KickerConstants {
+    public static final int KICKER_PORT = 40;
+    public static final boolean KICKER_REVERSED = false;
+
+    public static final double KICKER_SPEED = 0.9;
+  }
+
+  public static class RobotConstants {
+    public static final double robotWidthMeters = Units.inchesToMeters(25.0);
+    public static final double robotLengthMeters = Units.inchesToMeters(25.0);
+
+    public static final double TOTAL_MASS_KG = 10;
+    public static final double MOMENT_OF_INERTIA = 1;
+  }
+
+  public static class SwerveModuleConstants {
+    public static final double WHEEL_DIAMETER = Units.inchesToMeters(4);
+    public static final double COF = 1.2;
   }
 
   public static class DriveConstants {
@@ -192,15 +242,8 @@ public final class Constants {
     public static final double WHEEL_BASE = Units.inchesToMeters(22);
     // TODO: Set this for FWERB V2
     public static final Rotation2d GYRO_ANGLE_OFFSET = Rotation2d.fromDegrees(-90);
-    // TODO: I'm not going to touch this... but it seems important!
-    public static final double DRIVE_BASE_RADIUS = Units.inchesToMeters(15);
-    public static final PIDController AIMBOT_CONTROLLER = new PIDController(4,0,0);
-    public static final class ModuleIndices {
-      public static final int FRONT_LEFT = 1;
-      public static final int FRONT_RIGHT = 0;
-      public static final int REAR_LEFT = 3;
-      public static final int REAR_RIGHT = 2;
-    }
+
+    public static final PIDController ROTATION_CONTROLLER = new PIDController(5.2, 0.0, 0.01);
 
     public static final SwerveDriveKinematics KINEMATICS = new SwerveDriveKinematics(
         new Translation2d(TRACK_WIDTH / 2.0, WHEEL_BASE / 2.0),
@@ -210,73 +253,13 @@ public final class Constants {
 
     public static final double XY_SPEED_LIMIT = 1.0;
     public static final double Z_SPEED_LIMIT = 1.0;
-  }
 
-  public static final class CoralConstants {
-    public static final double ALIGN_DISTANCE = 13;
-    public static final double SENSOR_DISTANCE = 70; // in MM
-  }
-
-  public static final class ClimberConstants {
-    public static PIDController pidController = new PIDController(0.1, 0, 0);
-    public static final int climbMotorPort = 21;
-    public static final double motorTop = 20;
-    public static final double motorBottom = 0;
-  }
-
-  public static final class ElevatorConstants {
-    public static final int ELEVATOR_LEADER_PORT = 9;
-    public static final int ELEVATOR_FOLLOWER_PORT = 10;
-    public static final int ELEVATOR_LIMIT_SWITCH = 0;
-    public static final int INTAKE_LIMIT_SWITCH = 16;
-    public static final double ELEVATOR_TOP_LIMIT = 120; // change to actual number
-    public static final double ELEVATOR_BOTTOM_LIMIT = 0; // change to actual number
-    public static final double ELEVATOR_SPEED_LIMIT = 0.25;
-    public static final double ELEVATOR_PARK_HEIGHT = 16;
-    public static final double ELEVATOR_SPEED_MODIFIER = 0.5;
-    public static final double LV1 = 12; // tween this value
-    public static final double LV2 = 31.5; // tween this value
-    public static final double LV3 = 64; // tween this value
-    public static final double LV4 = 119; // tween this value
-    public static final double Intake = 7.5;
-    public static final int CORAL_LEADER_PORT = 14;
-    public static final int CORAL_FOLLOWER_PORT = 15;
-    public static final double CORAL_INTAKE_SPEED = 0.2;
-    public static final double CORAL_PLACE_SPEED = -0.2;
-
-    // pid valuse
-    public static final double kP = 0.01; // need to toon
-    public static final double kI = 0; // may not use
-    public static final double kD = 0; // may not use
-    public static final double PID_TOLERANCE = 0.1;
-    // feed forward values
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 0;
+    public static final double SLOW_MODE_MULT = 0.25;
+    public static final double FULL_DRIVE_MODE_MULT = 1.0;
   }
 
   public static class CommonConstants {
     public static final boolean LOG_INTO_FILE_ENABLED = true;
-  }
-
-  public static class AlgaeConstants {
-    public static final int ALGAE_INTAKE_PORT = 13;
-    public static final int ALGAE_MANIP_PORT = 19;
-    public static final double kS = 0;
-    public static final double kG = 0;
-    public static final double kV = 0;
-    public static final double ALGAE_HOLD_SPEED = 0.2; // 20 percent
-    public static final double ALGAE_INTAKE_SPEED = 0.5; // 50 percent
-    public static final double ALGAE_PLACE_SPEED = -0.2;
-    public static final int ALGAE_LIMIT_SWITCH = 3;
-    public static final double TOP_LIMIT = -50; // check
-    public static final double BOTTOM_LIMIT = 0; // check
-    public static final double deadband = 0.01;
-
-    public static final double motorOffset = Units.rotationsToRadians(0);
-    public static final PIDController PID_CONTROLLER = new PIDController(25, 0.001, 0);
-    public static final int encoderPort = 5;
-    public static final boolean Reversed = false;
   }
 
   public static final class PathPlannerConstants {
@@ -294,22 +277,12 @@ public final class Constants {
 
             SwerveModuleConstants.WHEEL_DIAMETER / 2,
             DriveConstants.MAX_MODULE_VELOCITY,
-            SwerveModuleConstants.WHEEL_FRICTION_COEFFICIENT, // TODO: ############## REPLACE PLACEHOLDERS
-                                                              // ##############
+            SwerveModuleConstants.COF, // TODO: ############## REPLACE PLACEHOLDERS
+                                       // ##############
             DCMotor.getNEO(1),
             DriveConstants.MAX_MODULE_CURRENT, // TODO: ############## REPLACE PLACEHOLDERS ##############
             4),
         DriveConstants.KINEMATICS.getModules());
   }
 
-  public static final class PoseConstants {
-    public static final AprilTagFieldLayout kAprilTagFieldLayout = AprilTagFieldLayout
-        .loadField(AprilTagFields.kDefaultField);
-    public static final double kPositionStdDevX = 0.1;
-    public static final double kPositionStdDevY = 0.1;
-    public static final double kPositionStdDevTheta = 10;
-    public static final double kVisionStdDevY = 5;
-    public static final double kVisionStdDevX = 5;
-    public static final double kVisionStdDevTheta = 500;
-  }
 }

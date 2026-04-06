@@ -2,10 +2,13 @@ package frc.robot.util;
 
 import org.photonvision.PhotonCamera;
 
+import edu.wpi.first.math.geometry.Transform3d;
+
 public class VisionCamera {
     private PhotonCamera camera;
     private boolean enabled;
     private boolean singleTagEstimation = false;
+    private Transform3d offset = new Transform3d();
 
     public VisionCamera(String name, boolean enabled) {
         this.camera = new PhotonCamera(name);
@@ -21,6 +24,11 @@ public class VisionCamera {
         this.camera = new PhotonCamera(builder.name);
         this.enabled = builder.isEnabled;
         this.singleTagEstimation = builder.isSingleTagEstimationEnabled;
+        this.offset = builder.offset;
+    }
+
+    public Transform3d getCameraOffset() {
+        return offset;
     }
 
     public boolean isSingleTagEstimationEnabled() {
@@ -47,6 +55,7 @@ public class VisionCamera {
         private String name;
         private boolean isEnabled = true;
         private boolean isSingleTagEstimationEnabled = false;
+        private Transform3d offset = new Transform3d();
 
         public Builder withName(String name) {
             this.name = name;
@@ -65,6 +74,11 @@ public class VisionCamera {
 
         public Builder withCameraDisabled() {
             this.isEnabled = false;
+            return this;
+        }
+
+        public Builder withOffset(Transform3d offTransform3d) {
+            this.offset = offTransform3d;
             return this;
         }
 

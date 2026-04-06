@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.5185568181818176,
+        "y": 4.091788908765653
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.248494525026322,
+        "y": 4.104237312531877
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.1530232558139533,
+        "y": 4.091788908765653
+      },
+      "prevControl": {
+        "x": 1.8851212818052963,
+        "y": 4.087957836445429
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Reverse Out Final"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 6.0,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

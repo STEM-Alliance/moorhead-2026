@@ -1,225 +1,130 @@
 package frc.robot.subsystems;
 
-import java.util.Objects;
-import java.util.function.Consumer;
-
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.ColorSensorV3.LEDCurrent;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.FeedForwardConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.LEDSubsystem.LedStyle;
 
-public class ShooterSubsystem implements Subsystem {
-    /*
-     * MotorPair<Primary, Follower>
-     */
-    private MotorPair m_sparkMaxPair;
-    /*
-     * Hood Spark Is To Adjust Hood Angle
-     */
-    private SparkMax m_hoodSpark; 
-    /*
-     * Current Shoot Mode
-     */
-    private ShootMode m_shootMode = ShootMode.Idle;
-    /*
-     * Voltage To Set Motor When m_shootMode==ShootMode.Shooting
-     */
-    private double m_shootRPM = 500;
-    /*
-     * List Of SpeedConsumers<double, consumer> that will be called once
-     * the current RPM goes over the double (RPM) 
-     */
-    private SparkClosedLoopController shooterClosedLoop = null;
+public class ShooterSubsystem extends SubsystemBase {
+    private final SparkFlex shooterLeader;
+    private final SparkFlex shooterFollower;
+    private final SparkMax hoodMotor;
+
+    private final SparkClosedLoopController shooterClosedLoop;
+
+    private double targetHoodAngle = 0.0;
+    private double targetRPM = 0.0;
+
     private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("shooter");
-    private double targetHoodAngle = 0;
+
+    public ShooterSubsystem() {
+        // Beam Break is false when not broken?
+        shooterLeader = new SparkFlex(ShooterConstants.SHOOTER_LEADER_PORT, MotorType.kBrushless);
+        shooterFollower = new SparkFlex(ShooterConstants.SHOOTER_FOLLOWER_PORT, MotorType.kBrushless);
+
+        SparkFlexConfig shooterLeaderConfig = new SparkFlexConfig();
+        shooterLeaderConfig.idleMode(IdleMode.kCoast).inverted(ShooterConstants.SHOOTER_LEADER_INVERTED);
+
+        shooterLeaderConfig.closedLoop
+                .pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I, ShooterConstants.SHOOTER_D)
+                .apply(new FeedForwardConfig().kA(ShooterConstants.SHOOTER_kA).kV(ShooterConstants.SHOOTER_kV));
+
+        SparkFlexConfig shooterFollowerConfig = new SparkFlexConfig();
+        shooterFollowerConfig.idleMode(IdleMode.kCoast).inverted(ShooterConstants.SHOOTER_FOLLOWER_INVERTED)
+                .follow(ShooterConstants.SHOOTER_LEADER_PORT, ShooterConstants.SHOOTER_FOLLOWER_INVERTED);
+
+        SparkMaxConfig hoodConfig = new SparkMaxConfig();
+        hoodConfig.idleMode(IdleMode.kBrake).inverted(ShooterConstants.HOOD_INVERTED);
+        hoodConfig.encoder.positionConversionFactor(ShooterConstants.HOOD_GEAR_RATIO);
+
+        // Configure motors
+        shooterLeader.configure(shooterLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        shooterFollower.configure(shooterFollowerConfig, ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+
+        shooterClosedLoop = shooterLeader.getClosedLoopController();
+
+        hoodMotor = new SparkMax(ShooterConstants.HOOD_MOTOR_PORT, MotorType.kBrushless);
+
+        hoodMotor.getEncoder().setPosition(ShooterConstants.MIN_HOOD_ANGLE / 360.0);
+
+        hoodMotor.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    }
+
+    public SparkMax getHoodMotor() {
+        return this.hoodMotor;
+    }
+
+    @Override
+    public void periodic() {
+
+        nt.putValue("target_hood_angle", NetworkTableValue.makeDouble(targetHoodAngle));
+        nt.putValue("target_shooter_rpm", NetworkTableValue.makeDouble(targetRPM));
+        nt.putValue("hood_angle", NetworkTableValue.makeDouble(getHoodAngle()));
+        nt.putValue("shooter_rpm", NetworkTableValue.makeDouble(shooterLeader.getEncoder().getVelocity()));
+        nt.putValue("leader_temp", NetworkTableValue.makeDouble(shooterLeader.getMotorTemperature()));
+        nt.putValue("follower_temp", NetworkTableValue.makeDouble(shooterFollower.getMotorTemperature()));
+        nt.putValue("hood_current", NetworkTableValue.makeDouble(hoodMotor.getOutputCurrent()));
+
+        targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.MIN_HOOD_ANGLE,
+                ShooterConstants.HOOD_MAX_ANGLE + ShooterConstants.MIN_HOOD_ANGLE);
+
+        shooterClosedLoop.setSetpoint(targetRPM, ControlType.kVelocity);
+        double hoodOutput = -ShooterConstants.HOOD_PID.calculate(targetHoodAngle, getHoodAngle());
+        hoodMotor.set(hoodOutput);
+
+        nt.putValue("hood_output", NetworkTableValue.makeDouble(hoodOutput));
+
+    }
+
+    public void setTargetHoodAngle(double target) {
+        nt.putValue("goal_angle", NetworkTableValue.makeDouble(target));
+        targetHoodAngle = MathUtil.clamp(target, ShooterConstants.MIN_HOOD_ANGLE,
+                ShooterConstants.HOOD_MAX_ANGLE + ShooterConstants.MIN_HOOD_ANGLE);
+    }
 
     public double getTargetHoodAngle() {
         return targetHoodAngle;
     }
 
-    public void setTargetHoodAngle(double targetHoodAngle) {
-        this.targetHoodAngle = targetHoodAngle;
+    public double getHoodAngle() {
+        return Units.rotationsToDegrees(hoodMotor.getEncoder().getPosition());
     }
 
-    public enum ShootMode {
-        Shooting, Idle
+    public void setShooterRPM(double rpm) {
+        targetRPM = MathUtil.clamp(rpm, 0.0, ShooterConstants.SHOOTER_MAX_RPM);
     }
 
-    public void addRPM(double addRpm) {
-        applyShooterRPM(this.m_shootRPM + addRpm);
-    }
-
-    public void applyShooterRPM(double rpm) {
-        this.m_shootRPM = MathUtil.clamp(rpm, 0, ShooterConstants.SHOOTER_MAX_RPM);
+    public double getTargetShooterRPM() {
+        return targetRPM;
     }
 
     public double getShooterRPM() {
-        return this.m_shootRPM;
+        return shooterLeader.getEncoder().getVelocity();
     }
 
-    public void requestShootMode(ShootMode shootMode) {
-        this.m_shootMode = shootMode;
-        switch (m_shootMode) {
-            case Shooting -> {
-                shooterClosedLoop.setSetpoint(m_shootRPM, ControlType.kVelocity);
-            }
-
-            case Idle -> {
-                shooterClosedLoop.setSetpoint(ShooterConstants.SHOOTER_IDLE_RPM, ControlType.kVelocity);
-            }
-        }
+    public boolean isReadyToShoot() {
+        return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 100;
     }
-
-    public ShootMode getShootMode() {
-        return m_shootMode;
-    }
-
-    public MotorPair getShooterMotors() {
-        return m_sparkMaxPair;
-    }
-
-    /*
-     * Initialize Shooter Motors (Primary + Secondary)
-     */
-
-    public ShooterSubsystem setShooterMotors(ShootMotor configPrimary, ShootMotor configFollower) {
-        if (!Objects.isNull(m_sparkMaxPair)) {
-            System.out.println("[WARNING] - MotorPair Is Already Set");
-            return this;
-        }
-
-        SparkFlex primary = new SparkFlex(configPrimary.canid(), MotorType.kBrushless);
-        SparkFlex follower = new SparkFlex(configFollower.canid(), MotorType.kBrushless);
-
-        SparkFlexConfig primaryConfig = new SparkFlexConfig();
-        primaryConfig
-                .idleMode(IdleMode.kCoast)
-                .inverted(configPrimary.reversed());
-
-        primaryConfig.closedLoop.pid(ShooterConstants.SHOOTER_P, ShooterConstants.SHOOTER_I, ShooterConstants.SHOOTER_D);
-
-        SparkFlexConfig followerConfig = new SparkFlexConfig();
-        followerConfig
-                .idleMode(IdleMode.kCoast)
-                .inverted(configFollower.reversed());
-
-        shooterClosedLoop = primary.getClosedLoopController();
-
-        primary.configure(primaryConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        followerConfig.follow(configPrimary.canid(), configFollower.reversed());
-        m_sparkMaxPair = new MotorPair(primary, follower);
-
-        return this;
-    }
-
-    /*
-     * Get Hood Motor
-     */
-
-    public ShooterSubsystem setHoodMotor(ShootMotor configHood) {
-        m_hoodSpark = new SparkMax(configHood.canid(), MotorType.kBrushless);
-
-        SparkMaxConfig hoodConfig = new SparkMaxConfig();
-        hoodConfig
-            .idleMode(IdleMode.kBrake)
-            .inverted(configHood.reversed());
-
-        hoodConfig.encoder
-            .positionConversionFactor(ShooterConstants.HOOD_GEAR_RATIO);
-
-        m_hoodSpark.configure(hoodConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-        return this;
-    }
-
-    public double getHoodPosition() {
-        return m_hoodSpark.getAbsoluteEncoder().getPosition();
-    }
-
-    public SparkMax getHood() {
-        return m_hoodSpark;
-    }
-
-   /*
-    * Periodic Used To Check When getRPM() > target RPM
-    */ 
-
-    @Override
-    public void periodic() {
-        nt.putValue("target_hood_angle", NetworkTableValue.makeDouble(targetHoodAngle));
-        nt.putValue("target_shooter_rpm", NetworkTableValue.makeDouble(m_shootRPM));
-        nt.putValue("hood_angle", NetworkTableValue.makeDouble(getRPM()));
-        nt.putValue("shooter_rpm", NetworkTableValue.makeDouble(getHoodPosition()));
-
-        targetHoodAngle = MathUtil.clamp(targetHoodAngle, ShooterConstants.HOOD_MIN_ANGLE, ShooterConstants.HOOD_MAX_ANGLE);
-    }
-
-    /*
-     * Gets Current Shooter RPM
-     */
-
-    private double getRPM() {
-        return Math.abs(m_sparkMaxPair.primary().getAbsoluteEncoder().getVelocity());
-    }
-
-    /*
-     * Verifies that the motor is set up properly
-     */
-
-    public void finish() {
-        if (Objects.isNull(m_sparkMaxPair)) {
-            System.out.println("[WARNING] - MotorPair Is Null");
-            return;
-        }
-        if (Objects.isNull(m_hoodSpark)) {
-            System.out.println("[WARNING] - HoodSpark Is Null");
-            return;
-        }
-        if (Objects.isNull(shooterClosedLoop)) {
-            System.out.println("[WARNING] - ShooterClosedLoop Is Null");
-            return;
-        }
-    }
-
-    public record ShootMotor(int canid, boolean reversed) {
-        public ShootMotor {
-            Objects.requireNonNull(canid);
-            Objects.requireNonNull(reversed);
-        }
-    }
-
-    /*
-     * Records (Basically Just Stores Its Inputs, Im going to guess you have never used this Colton)
-     * Records just save input(s) (ex. PairName(ClassType Name, ClassType Name2, ...))
-     * I usually use them for pairs or tuples, but you can use them with more then how every many
-     * Objects.requireNonNull is not required but they are there for saftey
-     * You can not set items in the pair, you can only get (basically all inputs are automatically final)
-     * To set a pair, make a new pair with the contents of the old pair
-     * 
-     */
-
-    
-
-    public record MotorPair(SparkFlex primary, SparkFlex follower) {
-        public MotorPair {
-            Objects.requireNonNull(primary);
-            Objects.requireNonNull(follower);
-        }
-    };
 
 }
