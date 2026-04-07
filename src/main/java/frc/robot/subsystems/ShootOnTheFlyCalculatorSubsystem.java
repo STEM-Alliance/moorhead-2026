@@ -109,10 +109,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
             wasBeamBreakBroken = false;
             ballsShot++;
             shootBall();
-            ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
-        } else if (isBeamBroken()) {
-            wasBeamBreakBroken = true;
-            ledSubsystem.setLEDStyle(LedStyle.SHOT);
+            ledSubsystem.LEDBalls(ballsShot);
         }
 
         ballSimulator.update();
