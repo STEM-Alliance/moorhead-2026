@@ -241,11 +241,11 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
         nt.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
         boolean inTolerance =  angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0 || Math.abs(360 - angleOffset) < 3.0;
-        if (inTolerance) {
-            ledSubsystem.setLEDStyle(LedStyle.AIMED);
-        } else if (ledSubsystem.getLEDStyle() == LedStyle.AIMED) {
-            ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
-        }
+        // if (inTolerance) {
+        //     ledSubsystem.setLEDStyle(LedStyle.AIMED);
+        // } else if (ledSubsystem.getLEDStyle() == LedStyle.AIMED) {
+        //     ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
+        // }
         return inTolerance;
     }
 
