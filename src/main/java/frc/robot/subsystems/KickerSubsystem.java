@@ -4,10 +4,7 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -30,7 +27,6 @@ public class KickerSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        networkTables.putValue("kicker_real_speed", NetworkTableValue.makeDouble(kicker.getEncoder().getVelocity()));
         networkTables.putValue("kicker_speed", NetworkTableValue.makeDouble(getKickerSpeed()));
     }
 
