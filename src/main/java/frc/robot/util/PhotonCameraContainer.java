@@ -12,35 +12,38 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class PhotonCameraContainer {
     private static ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
-    public static int cameraCount = 0;
+    public static int CAMERA_COUNT = 0;
     public static boolean HAS_MULTI_TAG_ESTIMATE = false;
 
     public static void addPhotonCamera(String name) {
         cameras.add(new VisionCamera(name));
-        cameraCount++;
+        CAMERA_COUNT++;
     }
 
     public static void addPhotonCamera(VisionCamera camera) {
         cameras.add(camera);
-        cameraCount++;
+        CAMERA_COUNT++;
     }
 
     public static void estimateVisionOdometry(CommandSwerveDrivetrain odometry) {
-        boolean is_multi = false;
+        boolean anyHasMultiTag = false;
+
         for (VisionCamera visionCamera : cameras) {
             if (visionCamera.isEnabled()) {
                 PhotonCamera camera = visionCamera.getPhotonCamera();
                 List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-                visionCamera.isSingleTagEstimationEnabled();
 
                 for (PhotonPipelineResult result : results) {
                     if (result.getMultiTagResult().isPresent()) {
-                        is_multi = true;
+                        anyHasMultiTag = true;
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
                         Pose2d pose = toPose2D(multiTagPose.plus(visionCamera.getCameraOffset()));
                         odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
-
                     } 
+                    
+                    // Single target estimation comes with issues and generally, there will
+                    // be several tags in view at any given time.
+
                     // else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
 
                     //     Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
@@ -57,9 +60,9 @@ public class PhotonCameraContainer {
                 }
 
             }
-
         }
-        HAS_MULTI_TAG_ESTIMATE = is_multi;
+        
+        HAS_MULTI_TAG_ESTIMATE = anyHasMultiTag;
     }
 
     public static ArrayList<VisionCamera> getVisionCameras() {

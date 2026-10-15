@@ -14,8 +14,7 @@ import frc.robot.Constants.MidtakeConstants;
 
 public class MidtakeSubsystem extends SubsystemBase {
     private final SparkMax hopper;
-    
-    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("midtake");
+    private final NetworkTable networkTables = NetworkTableInstance.getDefault().getTable("midtake");
 
     
     public MidtakeSubsystem() {
@@ -25,12 +24,11 @@ public class MidtakeSubsystem extends SubsystemBase {
         hopperConfig.inverted(MidtakeConstants.MIDTAKE_REVERSED);
 
         hopper.configure(hopperConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
     }
 
     @Override
     public void periodic() {
-        nt.putValue("midtake_speed", NetworkTableValue.makeDouble(getMidtakeSpeed()));
+        networkTables.putValue("midtake_speed", NetworkTableValue.makeDouble(getMidtakeSpeed()));
     }
 
     public double getMidtakeSpeed() {

@@ -16,8 +16,7 @@ import frc.robot.Constants.KickerConstants;
 
 public class KickerSubsystem extends SubsystemBase {
     private final SparkFlex kicker;
-    
-    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("kicker");
+    private final NetworkTable networkTables = NetworkTableInstance.getDefault().getTable("kicker");
 
     
     public KickerSubsystem() {
@@ -27,13 +26,12 @@ public class KickerSubsystem extends SubsystemBase {
         kickerConfig.inverted(KickerConstants.KICKER_REVERSED);
 
         kicker.configure(kickerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
     }
 
     @Override
     public void periodic() {
-        nt.putValue("kicker_real_speed", NetworkTableValue.makeDouble(kicker.getEncoder().getVelocity()));
-        nt.putValue("kicker_speed", NetworkTableValue.makeDouble(getKickerSpeed()));
+        networkTables.putValue("kicker_real_speed", NetworkTableValue.makeDouble(kicker.getEncoder().getVelocity()));
+        networkTables.putValue("kicker_speed", NetworkTableValue.makeDouble(getKickerSpeed()));
     }
 
     public double getKickerSpeed() {

@@ -112,21 +112,21 @@ public class RobotContainer {
                                         DriveConstants.ROTATION_CONTROLLER.getD());
 
         public RobotContainer() {
-                PhotonCameraContainer.addPhotonCamera(
-                                new VisionCamera.Builder().withName("FRCamera")
-                                                .withCameraEnabled()
-                                                .withOffset(
-                                                                new Transform3d(
-                                                                                Units.inchesToMeters(-10),
-                                                                                Units.inchesToMeters(10),
-                                                                                Units.inchesToMeters(7),
-                                                                                new Rotation3d(
-                                                                                                0,
-                                                                                                Units.degreesToRadians(
-                                                                                                                25),
-                                                                                                Units.degreesToRadians(
-                                                                                                                40))))
-                                                .build());
+                // PhotonCameraContainer.addPhotonCamera(
+                //                 new VisionCamera.Builder().withName("FRCamera")
+                //                                 .withCameraEnabled()
+                //                                 .withOffset(
+                //                                                 new Transform3d(
+                //                                                                 Units.inchesToMeters(-10),
+                //                                                                 Units.inchesToMeters(10),
+                //                                                                 Units.inchesToMeters(7),
+                //                                                                 new Rotation3d(
+                //                                                                                 0,
+                //                                                                                 Units.degreesToRadians(
+                //                                                                                                 25),
+                //                                                                                 Units.degreesToRadians(
+                //                                                                                                 35))))
+                //                                 .build());
 
                 PhotonCameraContainer.addPhotonCamera(
                                 new VisionCamera.Builder().withName("FLcamera")
@@ -134,14 +134,14 @@ public class RobotContainer {
                                                 .withOffset(
                                                                 new Transform3d(
                                                                                 -Units.inchesToMeters(10),
-                                                                                Units.inchesToMeters(10),
+                                                                                -Units.inchesToMeters(10),
                                                                                 Units.inchesToMeters(7),
                                                                                 new Rotation3d(
                                                                                                 0,
                                                                                                 Units.degreesToRadians(
                                                                                                                 25),
                                                                                                 Units.degreesToRadians(
-                                                                                                                -40))))
+                                                                                                                -35))))
                                                 .build());
 
                 // ---------- Commands ----------\\
@@ -263,7 +263,6 @@ public class RobotContainer {
                 // Left Trigger | Auto Aim + Shoot
 
                 driveController.leftTrigger()
-
                                 .whileTrue(new ParallelCommandGroup(
                                                 drivetrain.applyRequest(getAimRequest()),
                                                 new RepeatCommand(new SequentialCommandGroup(

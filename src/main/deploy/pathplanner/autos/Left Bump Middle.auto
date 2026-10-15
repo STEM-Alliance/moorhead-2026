@@ -1,0 +1,73 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "HubMiddle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Startup"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Out"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MiddleDepot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotMiddle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Find Camera"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake In"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

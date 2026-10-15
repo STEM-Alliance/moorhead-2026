@@ -23,7 +23,7 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX intake;
     private final SparkMax intakePivot;
-    private boolean wave = false;
+    private boolean waveMidtake = false;
 
     public enum IntakePosition {
         STOWED(IntakeConstants.PIVOT_MIN),
@@ -75,7 +75,7 @@ public class IntakeSubsystem extends SubsystemBase {
         double armTarget = position.angle;
         // double ff = IntakeConstants.PIVOT_FEEDFORWARD.calculate(Units.degreesToRadians(armTarget), 0.0);
         double sinWave = (Math.sin(System.currentTimeMillis() * 1) - 0.5) * 5; // 0.25-0.75 | Time * Speed
-        double output = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(), armTarget + (wave ? sinWave : 0));
+        double output = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(), armTarget + (waveMidtake ? sinWave : 0));
 
         intakePivot.set((output) / 12d);
 
@@ -86,7 +86,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setShake(boolean shake) {
-        this.wave = shake;
+        this.waveMidtake = shake;
     }
 
     public double getIntakeSpeed() {

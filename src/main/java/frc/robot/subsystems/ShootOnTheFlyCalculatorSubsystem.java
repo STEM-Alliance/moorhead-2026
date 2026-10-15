@@ -57,8 +57,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     private final DigitalInput beamBreak;
 
     private double prevTimestamp = 0.0;
-    private double dt = 0.02;
-    private int counter = 0;
+    private double deltaTime = 0.02;
     private Pose3d effectiveTargetLocation;
     private ShotSolution shotSolution;
     private BallSimulator ballSimulator = new BallSimulator(new BallConstants(
@@ -66,11 +65,11 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
             FieldConstants.FIELD_LENGTH, FieldConstants.FIELD_WIDTH);
     public Translation2d aimAtPoint = Translation2d.kZero;
 
-    public final NetworkTable nt = NetworkTableInstance.getDefault().getTable("otf_calculator");
-    public final StructArrayPublisher<Pose3d> goalAimPosition = nt.getStructArrayTopic("aim_at_points", Pose3d.struct)
+    public final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("otf_calculator");
+    public final StructArrayPublisher<Pose3d> goalAimPosition = networkTable.getStructArrayTopic("aim_at_points", Pose3d.struct)
             .publish();
 
-    StructPublisher<Pose3d> otfSolutionPublisher = nt.getStructTopic("otf_solution", Pose3d.struct).publish();
+    StructPublisher<Pose3d> otfSolutionPublisher = networkTable.getStructTopic("otf_solution", Pose3d.struct).publish();
 
     public ShootOnTheFlyCalculatorSubsystem(CommandSwerveDrivetrain commandSwerveDrivetrain,
             LEDSubsystem ledSubsystem) {
@@ -87,21 +86,21 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         ChassisSpeeds speeds = drivetrain.getChassisSpeeds();
         prevTimestamp = Timer.getFPGATimestamp();
 
-        accel = new ChassisAccelerations(speeds, prevSpeeds, dt);
+        accel = new ChassisAccelerations(speeds, prevSpeeds, deltaTime);
 
         solveOTF();
 
         prevSpeeds = speeds;
-        dt = Timer.getFPGATimestamp() - prevTimestamp;
+        deltaTime = Timer.getFPGATimestamp() - prevTimestamp;
 
-        nt.putValue("is_otf_solution", NetworkTableValue.makeBoolean(isOTFSolution()));
-        nt.putValue("shot_pitch", NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
-        nt.putValue("shot_speed", NetworkTableValue.makeDouble(shotSolution.launchSpeed()));
-        nt.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
-        nt.putValue("is_aligned", NetworkTableValue.makeBoolean(isAngleWithinTolerance()));
-        nt.putValue("balls_shot", NetworkTableValue.makeInteger(ballsShot));
-        nt.putValue("beambreak_broken", NetworkTableValue.makeBoolean(isBeamBroken()));
-        nt.putValue("should_aim_at_point", NetworkTableValue.makeBoolean(shouldAimAtPoint));
+        networkTable.putValue("is_otf_solution", NetworkTableValue.makeBoolean(isOTFSolution()));
+        networkTable.putValue("shot_pitch", NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
+        networkTable.putValue("shot_speed", NetworkTableValue.makeDouble(shotSolution.launchSpeed()));
+        networkTable.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
+        networkTable.putValue("is_aligned", NetworkTableValue.makeBoolean(isAngleWithinTolerance()));
+        networkTable.putValue("balls_shot", NetworkTableValue.makeInteger(ballsShot));
+        networkTable.putValue("beambreak_broken", NetworkTableValue.makeBoolean(isBeamBroken()));
+        networkTable.putValue("should_aim_at_point", NetworkTableValue.makeBoolean(shouldAimAtPoint));
 
         otfSolutionPublisher.set(effectiveTargetLocation);
         // Was Broken, Is
@@ -168,7 +167,6 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
                         return ShooterConstants.DISTANCE_TO_SHOOT_VELOCITY.get(dist);
                     },
                     5, 0
-
             );
         }
 
@@ -178,7 +176,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
         double targetDistance = currentPose.getTranslation()
                 .getDistance(effectiveTargetLocation.toPose2d().getTranslation());
-        nt.putValue("target_distance", NetworkTableValue.makeDouble(targetDistance));
+        networkTable.putValue("target_distance", NetworkTableValue.makeDouble(targetDistance));
 
         shotSolution = BallPhysics.solveBallisticWithIncomingAngle(new Pose3d(currentPose), effectiveTargetLocation,
                 Units.degreesToRadians(ShooterConstants.INCOMMING_SHOT_ANGLE));
@@ -201,10 +199,15 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         Pose2d targetPose;
 
         if (shouldAimAtPoint) {
+            /*
+             * This controlls wheather the robot should be aiming at
+             * our current side in order to auto shuttle
+             * 
+             * or aim at the hub to score
+             */
+            
             Translation2d currentTransform = drivetrain.getPose2d().getTranslation();
-
             Translation2d[] aimAtPoints = FieldConstants.getFieldPoints();
-
             Translation2d aimAt = Translation2d.kZero;
 
             if (aimAtPoints.length > 1) {
@@ -237,12 +240,19 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         double offsetX = robotPose.getX() - targetPose.getX(); // Long Side
         double offsetY = robotPose.getY() - targetPose.getY(); // Short Side
 
-        return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX))
-                + ((FieldConstants.getAlliance() == Alliance.Blue || DriverStation.isAutonomous()) ? Math.PI : 0));
+        /*
+         * Flip field when on blue team or when autonomous
+         */
+
+        boolean blueTeamOrAutonomous = (FieldConstants.getAlliance() == Alliance.Blue || DriverStation.isAutonomous());
+        double degreeOffset = blueTeamOrAutonomous ? Math.PI : 0;
+
+        return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX) + degreeOffset));
     }
+    
     public boolean isAngleWithinTolerance() {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
-        nt.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
+        networkTable.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
         boolean inTolerance =  angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0 || Math.abs(360 - angleOffset) < 3.0;
         if (inTolerance) {
             ledSubsystem.setLEDStyle(LedStyle.AIMED);

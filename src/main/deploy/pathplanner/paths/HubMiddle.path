@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.5646332737030413,
+        "y": 4.07556350626118
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.385173549123574,
+        "y": 4.2496158180926
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.5262075134168156,
+        "y": 4.07556350626118
+      },
+      "prevControl": {
+        "x": 2.3176250260841877,
+        "y": 3.9377471575280416
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Left Depot Finish"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.5,
+    "maxAcceleration": 6.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -1.3019526725788462
+  },
+  "reversed": false,
+  "folder": "Middle Depot",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
