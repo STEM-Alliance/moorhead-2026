@@ -33,22 +33,16 @@ public class ElasticSubsystem extends SubsystemBase {
         double currentTime = DriverStation.getMatchTime();
         double lastUpdateTime = lastTime;
 
-        updateMatchTime(currentTime);
-
-        networkTables.putValue("Voltage", NetworkTableValue.makeDouble(RobotController.getBatteryVoltage()));
+        updateStats(currentTime);
 
         if (lastUpdateTime <= -1)
             return;
 
         if (currentTime <= -1) {
-            if (!completedAuto) {
-                updateAction("Waiting for match...");
-            } else {
-                updateAction("Waiting for Tele");
-            }
+            updateAction(completedAuto ? "Waiting for Tele" : "Waiting for match...");
         } else if (DriverStation.isAutonomous()) {
-            completedAuto = true;
             updateAction("Auto Shift: " + decimalFormat.format(DriverStation.getMatchTime()) + "s");
+            completedAuto = true;
         } else if (currentTime > 30) {
             double lastPeriod = (lastUpdateTime - 30) % 25;
             double currentPeriod = (currentTime - 30) % 25;
@@ -92,8 +86,10 @@ public class ElasticSubsystem extends SubsystemBase {
         }
     }
 
-    public void updateMatchTime(double currentTime) {
-        SmartDashboard.putNumber("Match Time", currentTime);
+    public void updateStats(double currentTime) {
+        networkTables.putValue("Match Time", NetworkTableValue.makeDouble(currentTime));
+        networkTables.putValue("Voltage", NetworkTableValue.makeDouble(RobotController.getBatteryVoltage()));
+
         if (currentTime < 30 && lastTime > 30) {
             Notification notification = new Notification();
             notification.setTitle("Match Time");
