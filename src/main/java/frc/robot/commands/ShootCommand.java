@@ -10,14 +10,8 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.IntakeConstants;
-import frc.robot.Constants.KickerConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.ShooterConstants.ShotRegressionCoefficients;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.KickerSubsystem;
-import frc.robot.subsystems.MidtakeSubsystem;
 import frc.robot.subsystems.ShootOnTheFlyCalculatorSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -28,7 +22,6 @@ public class ShootCommand extends Command {
   private final ShootOnTheFlyCalculatorSubsystem shootOnTheFlyCalculatorSubsystem;
   private boolean shotReady = false;
   private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("ShootVelocity");
-
 
   // intake && hopper
 
@@ -54,9 +47,7 @@ public class ShootCommand extends Command {
     nt.putValue("Linear", NetworkTableValue.makeDouble(ShotRegressionCoefficients.linear(launch_speed)));
     nt.putValue("Exp", NetworkTableValue.makeDouble(ShotRegressionCoefficients.exponential(launch_speed)));
     nt.putValue("Cubic", NetworkTableValue.makeDouble(ShotRegressionCoefficients.cubic(launch_speed)));
-    nt.putValue("Old Exp", NetworkTableValue.makeDouble(getRPM(launch_speed) * 1000d));
-        nt.putValue("Eyeball", NetworkTableValue.makeDouble(ShooterConstants.SHOT_VELOCITY_TO_RPS.get(launch_speed) * 45));
-
+    nt.putValue("Eyeball", NetworkTableValue.makeDouble(ShooterConstants.SHOT_VELOCITY_TO_RPS.get(launch_speed) * 45));
 
     double goal_rpm = ShotRegressionCoefficients.cubic(launch_speed);
     double goal_pitch = 90
@@ -65,21 +56,22 @@ public class ShootCommand extends Command {
     shooter.setShooterRPM(goal_rpm);
     shooter.setTargetHoodAngle(goal_pitch);
 
-    nt.putValue("IsAngleWithinTolerance", NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
-    nt.putValue("IsReadyToShoot", NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
-    if (RobotBase.isSimulation() && shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()) {
-        shotReady = true;
-    } else if (shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()
-        && shooter.isReadyToShoot()) {
-      shotReady = true;
-    }
-    ;
+    nt.putValue("IsAngleWithinTolerance",
+        NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
+    nt.putValue("IsReadyToShoot",
+        NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
 
+    shotReady = getIsShotReady();
   }
 
-  public double getRPM(double shotVelocity) {
-    return -1.63897 + 2.26834 * Math.log(shotVelocity);
-    // return (0.240186 * shotVelocity)+0.965213;
+  private boolean getIsShotReady() {
+    if (RobotBase.isSimulation() && shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()) {
+      return true;
+    } else if (shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()
+        && shooter.isReadyToShoot()) {
+      return true;
+    }
+    return false;
   }
 
   // Called once the command ends or is interrupted.

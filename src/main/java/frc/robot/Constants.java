@@ -205,7 +205,6 @@ public final class Constants {
     public static final boolean MIDTAKE_REVERSED = true;
 
     public static final double MIDTAKE_SPEED = 1;
-
   }
 
   public static final class KickerConstants {

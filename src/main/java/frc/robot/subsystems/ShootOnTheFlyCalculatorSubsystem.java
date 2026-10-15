@@ -66,7 +66,8 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     public Translation2d aimAtPoint = Translation2d.kZero;
 
     public final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("otf_calculator");
-    public final StructArrayPublisher<Pose3d> goalAimPosition = networkTable.getStructArrayTopic("aim_at_points", Pose3d.struct)
+    public final StructArrayPublisher<Pose3d> goalAimPosition = networkTable
+            .getStructArrayTopic("aim_at_points", Pose3d.struct)
             .publish();
 
     StructPublisher<Pose3d> otfSolutionPublisher = networkTable.getStructTopic("otf_solution", Pose3d.struct).publish();
@@ -94,7 +95,8 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         deltaTime = Timer.getFPGATimestamp() - prevTimestamp;
 
         networkTable.putValue("is_otf_solution", NetworkTableValue.makeBoolean(isOTFSolution()));
-        networkTable.putValue("shot_pitch", NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
+        networkTable.putValue("shot_pitch",
+                NetworkTableValue.makeDouble(Units.radiansToDegrees(shotSolution.launchPitchRad())));
         networkTable.putValue("shot_speed", NetworkTableValue.makeDouble(shotSolution.launchSpeed()));
         networkTable.putValue("is_shot_solution", NetworkTableValue.makeBoolean(isShotSolution()));
         networkTable.putValue("is_aligned", NetworkTableValue.makeBoolean(isAngleWithinTolerance()));
@@ -166,8 +168,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
                     (dist) -> {
                         return ShooterConstants.DISTANCE_TO_SHOOT_VELOCITY.get(dist);
                     },
-                    5, 0
-            );
+                    5, 0);
         }
 
         if (currentPose.getX() - goal.getX() < 0 && !shouldAimAtPoint) {
@@ -192,24 +193,24 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     }
 
     public void aimAtShuttlePoint(boolean aimAtShuttlePoint) {
-                this.shouldAimAtPoint = aimAtShuttlePoint;
-        }
+        this.shouldAimAtPoint = aimAtShuttlePoint;
+    }
 
     public Rotation2d getAimAngle() {
         Pose2d targetPose;
 
-        if (shouldAimAtPoint) {
-            /*
-             * This controlls wheather the robot should be aiming at
-             * our current side in order to auto shuttle
-             * 
-             * or aim at the hub to score
-             */
-            
-            Translation2d currentTransform = drivetrain.getPose2d().getTranslation();
-            Translation2d[] aimAtPoints = FieldConstants.getFieldPoints();
-            Translation2d aimAt = Translation2d.kZero;
+        /*
+         * This controlls wheather the robot should be aiming at
+         * the closest point on our current side in order to auto shuttle
+         * 
+         * or aim at the hub to score
+         */
 
+        if (shouldAimAtPoint) {
+            Translation2d currentTransform = drivetrain.getPose2d().getTranslation();
+            Translation2d aimAt = Translation2d.kZero;
+            Translation2d[] aimAtPoints = FieldConstants.getFieldPoints();
+            
             if (aimAtPoints.length > 1) {
                 goalAimPosition.set(new Pose3d[] {
                         new Pose3d(aimAtPoints[0].getX(), aimAtPoints[0].getY(), 0, new Rotation3d(0, 0, 0)),
@@ -249,11 +250,12 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
         return new Rotation2d(MathUtil.angleModulus(Math.atan2(offsetY, offsetX) + degreeOffset));
     }
-    
+
     public boolean isAngleWithinTolerance() {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
         networkTable.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
-        boolean inTolerance =  angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0 || Math.abs(360 - angleOffset) < 3.0;
+        boolean inTolerance = angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0
+                || Math.abs(360 - angleOffset) < 3.0;
         if (inTolerance) {
             ledSubsystem.setLEDStyle(LedStyle.AIMED);
         } else if (ledSubsystem.getLEDStyle() == LedStyle.AIMED) {

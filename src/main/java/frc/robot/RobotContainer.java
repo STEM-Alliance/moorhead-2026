@@ -113,20 +113,20 @@ public class RobotContainer {
 
         public RobotContainer() {
                 // PhotonCameraContainer.addPhotonCamera(
-                //                 new VisionCamera.Builder().withName("FRCamera")
-                //                                 .withCameraEnabled()
-                //                                 .withOffset(
-                //                                                 new Transform3d(
-                //                                                                 Units.inchesToMeters(-10),
-                //                                                                 Units.inchesToMeters(10),
-                //                                                                 Units.inchesToMeters(7),
-                //                                                                 new Rotation3d(
-                //                                                                                 0,
-                //                                                                                 Units.degreesToRadians(
-                //                                                                                                 25),
-                //                                                                                 Units.degreesToRadians(
-                //                                                                                                 35))))
-                //                                 .build());
+                // new VisionCamera.Builder().withName("FRCamera")
+                // .withCameraEnabled()
+                // .withOffset(
+                // new Transform3d(
+                // Units.inchesToMeters(-10),
+                // Units.inchesToMeters(10),
+                // Units.inchesToMeters(7),
+                // new Rotation3d(
+                // 0,
+                // Units.degreesToRadians(
+                // 25),
+                // Units.degreesToRadians(
+                // 35))))
+                // .build());
 
                 PhotonCameraContainer.addPhotonCamera(
                                 new VisionCamera.Builder().withName("FLcamera")
@@ -282,12 +282,10 @@ public class RobotContainer {
 
                                                                                 }),
                                                                 new WaitUntilCommand(new BooleanSupplier() {
-
                                                                         @Override
                                                                         public boolean getAsBoolean() {
                                                                                 return otfSubsystem.getWasBeamBroken();
                                                                         }
-
                                                                 })))))
                                 .onFalse(new InstantCommand(() -> {
                                         drivetrain.applyRequest(getDefaultDriveCommand());
