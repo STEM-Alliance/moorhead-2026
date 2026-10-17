@@ -202,7 +202,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
             Translation2d currentTransform = drivetrain.getPose2d().getTranslation();
             Translation2d aimAt = Translation2d.kZero;
             Translation2d[] aimAtPoints = FieldConstants.getFieldPoints();
-            
+
             if (aimAtPoints.length > 1) {
                 goalAimPosition.set(new Pose3d[] {
                         new Pose3d(aimAtPoints[0].getX(), aimAtPoints[0].getY(), 0, new Rotation3d(0, 0, 0)),
@@ -246,13 +246,17 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     public boolean isAngleWithinTolerance() {
         double angleOffset = Math.abs(getAimAngle().getDegrees() - drivetrain.getPose2d().getRotation().getDegrees());
         networkTable.putValue("Angle Offset", NetworkTableValue.makeDouble(angleOffset));
-        boolean inTolerance = angleOffset < 3.0 || Math.abs(180 - angleOffset) < 3.0
-                || Math.abs(360 - angleOffset) < 3.0;
+
+        boolean inTolerance = angleOffset < ShooterConstants.AIM_TOLERANCE
+                || Math.abs(180 - angleOffset) < ShooterConstants.AIM_TOLERANCE
+                || Math.abs(360 - angleOffset) < ShooterConstants.AIM_TOLERANCE;
+
         if (inTolerance) {
             ledSubsystem.setLEDStyle(LedStyle.AIMED);
         } else if (ledSubsystem.getLEDStyle() == LedStyle.AIMED) {
             ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
         }
+        
         return inTolerance;
     }
 

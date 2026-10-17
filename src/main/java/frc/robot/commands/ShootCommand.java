@@ -21,7 +21,7 @@ public class ShootCommand extends Command {
 
   private final ShootOnTheFlyCalculatorSubsystem shootOnTheFlyCalculatorSubsystem;
   private boolean shotReady = false;
-  private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("ShootVelocity");
+  private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("ShootVelocity");
 
   // intake && hopper
 
@@ -43,22 +43,22 @@ public class ShootCommand extends Command {
   public void execute() {
     if (!shootOnTheFlyCalculatorSubsystem.isOTFSolution() || !shootOnTheFlyCalculatorSubsystem.isShotSolution())
       return;
-    double launch_speed = shootOnTheFlyCalculatorSubsystem.getShotSolution().launchSpeed();
-    nt.putValue("Linear", NetworkTableValue.makeDouble(ShotRegressionCoefficients.linear(launch_speed)));
-    nt.putValue("Exp", NetworkTableValue.makeDouble(ShotRegressionCoefficients.exponential(launch_speed)));
-    nt.putValue("Cubic", NetworkTableValue.makeDouble(ShotRegressionCoefficients.cubic(launch_speed)));
-    nt.putValue("Eyeball", NetworkTableValue.makeDouble(ShooterConstants.SHOT_VELOCITY_TO_RPS.get(launch_speed) * 45));
+    double launchSpeed = shootOnTheFlyCalculatorSubsystem.getShotSolution().launchSpeed();
+    networkTable.putValue("Linear", NetworkTableValue.makeDouble(ShotRegressionCoefficients.linear(launchSpeed)));
+    networkTable.putValue("Exp", NetworkTableValue.makeDouble(ShotRegressionCoefficients.exponential(launchSpeed)));
+    networkTable.putValue("Cubic", NetworkTableValue.makeDouble(ShotRegressionCoefficients.cubic(launchSpeed)));
+    networkTable.putValue("Eyeball", NetworkTableValue.makeDouble(ShooterConstants.SHOT_VELOCITY_TO_RPS.get(launchSpeed) * 45));
 
-    double goal_rpm = ShotRegressionCoefficients.cubic(launch_speed);
-    double goal_pitch = 90
+    double goalRPM = ShotRegressionCoefficients.cubic(launchSpeed);
+    double goalPitch = 90
         - Units.radiansToDegrees(shootOnTheFlyCalculatorSubsystem.getShotSolution().launchPitchRad());
 
-    shooter.setShooterRPM(goal_rpm);
-    shooter.setTargetHoodAngle(goal_pitch);
+    shooter.setShooterRPM(goalRPM);
+    shooter.setTargetHoodAngle(goalPitch);
 
-    nt.putValue("IsAngleWithinTolerance",
+    networkTable.putValue("IsAngleWithinTolerance",
         NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
-    nt.putValue("IsReadyToShoot",
+    networkTable.putValue("IsReadyToShoot",
         NetworkTableValue.makeBoolean(shootOnTheFlyCalculatorSubsystem.isAngleWithinTolerance()));
 
     shotReady = getIsShotReady();

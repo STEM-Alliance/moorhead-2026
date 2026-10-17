@@ -162,6 +162,7 @@ public final class Constants {
     }
     public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
     public static final double INCOMMING_SHOT_ANGLE = -50;
+    public static final double AIM_TOLERANCE = 3d; // 3degrees
 
     public static class ShotRegressionCoefficients {
       public static double linear(double velocity) {
