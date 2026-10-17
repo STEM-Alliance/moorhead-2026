@@ -1,22 +1,14 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkMaxConfig;
-
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -36,7 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    private final NetworkTable nt = NetworkTableInstance.getDefault().getTable("intake");
+    private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("intake");
 
     private IntakePosition position = IntakePosition.STOWED;
 
@@ -65,19 +57,28 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        nt.putValue("intake_speed", NetworkTableValue.makeDouble(getIntakeSpeed()));
-        nt.putValue("intake_set_position", NetworkTableValue.makeString(position.toString()));
-        nt.putValue("intake_goal_position", NetworkTableValue.makeDouble(position.angle));
-        nt.putValue("intake_position", NetworkTableValue.makeDouble(intakePivot.getEncoder().getPosition()));
-        nt.putValue("intake_pivot_output", NetworkTableValue.makeDouble(intakePivot.get()));
-        nt.putValue("intake_pivot_velocity", NetworkTableValue.makeDouble(intakePivot.getEncoder().getVelocity()));
+        networkTable.putValue("intake_speed", NetworkTableValue.makeDouble(getIntakeSpeed()));
+        networkTable.putValue("intake_set_position", NetworkTableValue.makeString(position.toString()));
+        networkTable.putValue("intake_goal_position", NetworkTableValue.makeDouble(position.angle));
+        networkTable.putValue("intake_position", NetworkTableValue.makeDouble(intakePivot.getEncoder().getPosition()));
+        networkTable.putValue("intake_pivot_output", NetworkTableValue.makeDouble(intakePivot.get()));
+        networkTable.putValue("intake_pivot_velocity",
+                NetworkTableValue.makeDouble(intakePivot.getEncoder().getVelocity()));
 
         double armTarget = position.angle;
-        // double ff = IntakeConstants.PIVOT_FEEDFORWARD.calculate(Units.degreesToRadians(armTarget), 0.0);
-        double sinWave = (Math.sin(System.currentTimeMillis() * 1) - 0.5) * 5; // 0.25-0.75 | Time * Speed
-        double output = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(), armTarget + (waveMidtake ? sinWave : 0));
+        // double ff =
+        // IntakeConstants.PIVOT_FEEDFORWARD.calculate(Units.degreesToRadians(armTarget),
+        // 0.0);
+        double intakeShakeWave = Math.sin(System.currentTimeMillis() * IntakeConstants.SHAKE_FREQUENCY)
+                * IntakeConstants.SHAKE_AMPLITUDE; // -5 -> 5 | Time * Speed | Period - 1 second
+        double outputPosition = Math.min(
+                Math.max(
+                        IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(),
+                                armTarget + (waveMidtake ? intakeShakeWave : 0)),
+                        IntakeConstants.PIVOT_MIN),
+                IntakeConstants.PIVOT_MAX);
 
-        intakePivot.set((output) / 12d);
+        intakePivot.set(outputPosition / IntakeConstants.GEAR_RATIO);
 
     }
 

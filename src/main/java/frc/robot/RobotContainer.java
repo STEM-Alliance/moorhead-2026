@@ -145,6 +145,19 @@ public class RobotContainer {
                                                 .build());
 
                 // ---------- Commands ----------\\
+                /*
+                 * These commands are called and controlled by pathplanner
+                 * 
+                 * For example, at the beginning of each path
+                 * startup is called in order to reset everything into its
+                 * default state.
+                 * 
+                 * Actual Example:
+                 * namedCommand < Startup >
+                 * followPath < Left Trench Out >
+                 * namedCommand < Shoot >
+                 */
+
                 NamedCommands.registerCommand("Startup", new InstantCommand(() -> {
                         intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
                         MTKESubsystem.setMidtakeSpeed(0);
@@ -258,7 +271,9 @@ public class RobotContainer {
 
                 // Button B | X-Stance (Stop Moving + Rotating Instantly)
 
-                driveController.b().onTrue(drivetrain.applyRequest(() -> xStance));
+                driveController.b()
+                                .onTrue(drivetrain.applyRequest(() -> xStance))
+                                .onFalse(drivetrain.applyRequest(getDefaultDriveCommand()));
 
                 // Left Trigger | Auto Aim + Shoot
 
@@ -271,6 +286,7 @@ public class RobotContainer {
                                                                                         0);
                                                                         kickerSubsystem.setKickerSpeed(
                                                                                         KickerConstants.KICKER_SPEED);
+                                                                        intakeSubsystem.setShake(true);
                                                                 }),
                                                                 new ShootCommand(
                                                                                 shooter,
@@ -293,6 +309,7 @@ public class RobotContainer {
                                         kickerSubsystem.setKickerSpeed(0);
                                         shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
                                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                                        intakeSubsystem.setShake(false);
                                 }));
 
                 driveController.leftBumper()
@@ -372,11 +389,13 @@ public class RobotContainer {
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
                         shooter.setShooterRPM(6000);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 25);
+                        intakeSubsystem.setShake(true);
                 })).onFalse(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(0);
                         MTKESubsystem.setMidtakeSpeed(0);
                         shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
+                        intakeSubsystem.setShake(false);
                 }));
 
                 operatorController.x().onTrue(new SequentialCommandGroup(

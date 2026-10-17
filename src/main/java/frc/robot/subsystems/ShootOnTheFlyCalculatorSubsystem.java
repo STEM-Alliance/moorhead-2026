@@ -4,17 +4,11 @@ import static edu.wpi.first.units.Units.Grams;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
-
-import org.opencv.dnn.Net;
-
-import com.revrobotics.ColorSensorV3.LEDCurrent;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -30,9 +24,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.FieldConstants;
-import frc.robot.Constants.PoseConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.LEDSubsystem.LedStyle;
 import frc.robot.util.BallConstants;
@@ -42,12 +34,10 @@ import frc.robot.util.BallState;
 import frc.robot.util.ChassisAccelerations;
 import frc.robot.util.ShootOnTheFlyCalculator;
 import frc.robot.util.BallPhysics.ShotSolution;
-import frc.robot.util.ShootOnTheFlyCalculator.InterceptSolution;
 
 public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
     private ChassisAccelerations accel = new ChassisAccelerations(0, 0, 0);
-    private InterceptSolution interceptSolution;
     private final CommandSwerveDrivetrain drivetrain;
 
     private final LEDSubsystem ledSubsystem;
@@ -105,11 +95,12 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         networkTable.putValue("should_aim_at_point", NetworkTableValue.makeBoolean(shouldAimAtPoint));
 
         otfSolutionPublisher.set(effectiveTargetLocation);
-        // Was Broken, Is
+
+        // Was Broken, Is broken
         if (wasBeamBreakBroken && !isBeamBroken()) {
             wasBeamBreakBroken = false;
             ballsShot++;
-            shootBall();
+            simulateShotBall();
             ledSubsystem.updateDefaultLED(ballsShot);
             ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
         } else if (isBeamBroken()) {
@@ -120,7 +111,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         ballSimulator.update();
     }
 
-    public void shootBall() {
+    public void simulateShotBall() {
         Translation3d drivetrainVeloTransform = new Translation3d(drivetrain.getChassisSpeeds().vxMetersPerSecond,
                 drivetrain.getChassisSpeeds().vyMetersPerSecond, 0);
         Pose2d drivetrainPose = drivetrain.getPose2d();

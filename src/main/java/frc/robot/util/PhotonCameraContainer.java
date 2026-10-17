@@ -40,9 +40,9 @@ public class PhotonCameraContainer {
                         Pose2d pose = toPose2D(multiTagPose.plus(visionCamera.getCameraOffset()));
                         odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
                     } 
-                    
+
                     // Single target estimation comes with issues and generally, there will
-                    // be several tags in view at any given time.
+                    // be several tags in view at any given time because there are a lot of tags.
 
                     // else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
 

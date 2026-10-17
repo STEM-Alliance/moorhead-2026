@@ -196,8 +196,13 @@ public final class Constants {
         new Constraints(100, 100));
 
     public static final double INTAKE_SPEED = 0.4;
+    public static final double GEAR_RATIO = 12d;
     public static final double PIVOT_MIN = 10;
     public static final double PIVOT_MAX = 22.5;
+
+    public static final double SHAKE_FREQUENCY = 1d;
+    public static final double SHAKE_AMPLITUDE = 10d;
+
   }
 
   public static final class MidtakeConstants {
