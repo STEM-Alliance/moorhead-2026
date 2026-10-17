@@ -82,7 +82,7 @@ public class DriveSubsystem extends SubsystemBase {
         robotField.setRobotPose(drivetrain.getPose2d());
 
         SmartDashboard.putData("elastic_field_pose", robotField);
-        networkTables.putValue("has_multi_tag_estimate", NetworkTableValue.makeBoolean(PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE));
+        networkTables.putValue("has_multi_tag_estimate", NetworkTableValue.makeBoolean(PhotonCameraContainer.hasMultiTagEstimate()));
         robotPosePublisher.set(drivetrain.getPose2d());
         moduleStatePublisher.set(drivetrain.getState().ModuleStates);
         moduleTargetsPublisher.set(drivetrain.getState().ModuleTargets);

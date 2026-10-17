@@ -29,7 +29,6 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("intake");
-
     private IntakePosition position = IntakePosition.STOWED;
 
     public IntakeSubsystem() {

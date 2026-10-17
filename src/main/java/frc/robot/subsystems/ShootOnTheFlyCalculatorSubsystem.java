@@ -151,7 +151,6 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
                         return ShooterConstants.DISTANCE_TO_SHOOT_VELOCITY.get(dist);
                     },
                     5, 0
-
             );
         } else {
             effectiveTargetLocation = ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
@@ -256,7 +255,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         } else if (ledSubsystem.getLEDStyle() == LedStyle.AIMED) {
             ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
         }
-        
+
         return inTolerance;
     }
 

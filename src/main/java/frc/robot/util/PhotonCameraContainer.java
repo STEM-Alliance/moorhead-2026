@@ -12,8 +12,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class PhotonCameraContainer {
     private static ArrayList<VisionCamera> cameras = new ArrayList<VisionCamera>();
+    private static boolean HAS_MULTI_TAG_ESTIMATE = false;
     public static int CAMERA_COUNT = 0;
-    public static boolean HAS_MULTI_TAG_ESTIMATE = false;
 
     public static void addPhotonCamera(String name) {
         cameras.add(new VisionCamera(name));
@@ -23,6 +23,10 @@ public class PhotonCameraContainer {
     public static void addPhotonCamera(VisionCamera camera) {
         cameras.add(camera);
         CAMERA_COUNT++;
+    }
+
+    public static boolean hasMultiTagEstimate() {
+        return HAS_MULTI_TAG_ESTIMATE;
     }
 
     public static void estimateVisionOdometry(CommandSwerveDrivetrain odometry) {
@@ -39,29 +43,33 @@ public class PhotonCameraContainer {
                         Transform3d multiTagPose = result.getMultiTagResult().get().estimatedPose.best;
                         Pose2d pose = toPose2D(multiTagPose.plus(visionCamera.getCameraOffset()));
                         odometry.addVisionMeasurement(pose, result.getTimestampSeconds());
-                    } 
+                    }
 
                     // Single target estimation comes with issues and generally, there will
                     // be several tags in view at any given time because there are a lot of tags.
 
-                    // else if (visionCamera.isSingleTagEstimationEnabled() && result.getBestTarget() != null) {
+                    // else if (visionCamera.isSingleTagEstimationEnabled() &&
+                    // result.getBestTarget() != null) {
 
-                    //     Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
-                    //     Pose3d tagToField = PoseConstants.kAprilTagFieldLayout
-                    //             .getTagPose(result.getBestTarget().fiducialId).get();
+                    // Transform3d tagToCamera = result.getBestTarget().altCameraToTarget;
+                    // Pose3d tagToField = PoseConstants.kAprilTagFieldLayout
+                    // .getTagPose(result.getBestTarget().fiducialId).get();
 
-                    //     if (tagToField == null)
-                    //         continue;
+                    // if (tagToField == null)
+                    // continue;
 
-                    //     Pose3d robotPose = tagToField.transformBy(tagToCamera);//.rotateBy(new Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
-                    //     // robotPose = robotPose.rotateAround(robotPose.getTranslation(), new Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
-                    //     odometry.addVisionMeasurement(robotPose.toPose2d(), result.getTimestampSeconds());
+                    // Pose3d robotPose = tagToField.transformBy(tagToCamera);//.rotateBy(new
+                    // Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
+                    // // robotPose = robotPose.rotateAround(robotPose.getTranslation(), new
+                    // Rotation3d(0,0,DriveConstants.GYRO_ANGLE_OFFSET.getRadians()));
+                    // odometry.addVisionMeasurement(robotPose.toPose2d(),
+                    // result.getTimestampSeconds());
                     // }
                 }
 
             }
         }
-        
+
         HAS_MULTI_TAG_ESTIMATE = anyHasMultiTag;
     }
 

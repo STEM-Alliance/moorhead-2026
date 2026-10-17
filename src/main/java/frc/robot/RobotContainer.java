@@ -169,12 +169,12 @@ public class RobotContainer {
 
                 NamedCommands.registerCommand("Find Camera", new SequentialCommandGroup(
                                 new InstantCommand(() -> {
-                                        if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE == false) {
+                                        if (PhotonCameraContainer.hasMultiTagEstimate() == false) {
                                                 drivetrain.applyRequest(getRotateSlow()).execute();
                                         }
                                 }),
                                 new WaitUntilCommand(() -> {
-                                        if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE) {
+                                        if (PhotonCameraContainer.hasMultiTagEstimate()) {
                                                 drivetrain.applyRequest(() -> xStance).execute();
                                                 return true;
                                         }
@@ -428,7 +428,7 @@ public class RobotContainer {
         }
 
         public Pose2d getStartingPose() {
-                if (PhotonCameraContainer.HAS_MULTI_TAG_ESTIMATE) {
+                if (PhotonCameraContainer.hasMultiTagEstimate()) {
                         return drivetrain.getPose2d();
                 } else {
                         // Assume against alliance wall (hub center)

@@ -21,7 +21,7 @@ public class ShootCommand extends Command {
 
   private final ShootOnTheFlyCalculatorSubsystem shootOnTheFlyCalculatorSubsystem;
   private boolean shotReady = false;
-  private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("ShootVelocity");
+  private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("shoot_goal");
 
   // intake && hopper
 
