@@ -112,21 +112,21 @@ public class RobotContainer {
                                         DriveConstants.ROTATION_CONTROLLER.getD());
 
         public RobotContainer() {
-                // PhotonCameraContainer.addPhotonCamera(
-                // new VisionCamera.Builder().withName("FRCamera")
-                // .withCameraEnabled()
-                // .withOffset(
-                // new Transform3d(
-                // Units.inchesToMeters(-10),
-                // Units.inchesToMeters(10),
-                // Units.inchesToMeters(7),
-                // new Rotation3d(
-                // 0,
-                // Units.degreesToRadians(
-                // 25),
-                // Units.degreesToRadians(
-                // 35))))
-                // .build());
+                PhotonCameraContainer.addPhotonCamera(
+                                new VisionCamera.Builder().withName("FRCamera")
+                                                .withCameraDisabled()
+                                                .withOffset(
+                                                                new Transform3d(
+                                                                                Units.inchesToMeters(-10),
+                                                                                Units.inchesToMeters(10),
+                                                                                Units.inchesToMeters(7),
+                                                                                new Rotation3d(
+                                                                                                0,
+                                                                                                Units.degreesToRadians(
+                                                                                                                25),
+                                                                                                Units.degreesToRadians(
+                                                                                                                35))))
+                                                .build());
 
                 PhotonCameraContainer.addPhotonCamera(
                                 new VisionCamera.Builder().withName("FLcamera")
