@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import com.fasterxml.jackson.annotation.JacksonInject.Value;
 
+import com.fasterxml.jackson.annotation.JacksonInject.Value;
+
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
