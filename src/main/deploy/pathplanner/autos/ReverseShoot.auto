@@ -11,6 +11,12 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "ReverseOut"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Find Camera"
@@ -38,12 +44,6 @@
           "type": "named",
           "data": {
             "name": "Intake Out"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ReverseOut"
           }
         },
         {

@@ -70,12 +70,8 @@ public class IntakeSubsystem extends SubsystemBase {
         // 0.0);
         double intakeShakeWave = Math.sin(System.currentTimeMillis() * IntakeConstants.SHAKE_FREQUENCY)
                 * IntakeConstants.SHAKE_AMPLITUDE; // -5 -> 5 | Time * Speed | Period - 1 second
-        double outputPosition = Math.min(
-                Math.max(
-                        IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(),
-                                armTarget + (waveMidtake ? intakeShakeWave : 0)),
-                        IntakeConstants.PIVOT_MIN),
-                IntakeConstants.PIVOT_MAX);
+        double outputPosition = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(),
+                                armTarget + (waveMidtake ? intakeShakeWave : 0));
 
         intakePivot.set(outputPosition / IntakeConstants.GEAR_RATIO);
 
