@@ -36,15 +36,15 @@ import frc.robot.util.ShootOnTheFlyCalculator;
 import frc.robot.util.BallPhysics.ShotSolution;
 
 public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
+    private final CommandSwerveDrivetrain drivetrain;
+    private final LEDSubsystem ledSubsystem;
+    private final DigitalInput beamBreak;
+
     private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
     private ChassisAccelerations accel = new ChassisAccelerations(0, 0, 0);
-    private final CommandSwerveDrivetrain drivetrain;
-
-    private final LEDSubsystem ledSubsystem;
     private boolean wasBeamBreakBroken = false;
-    public boolean shouldAimAtPoint = false;
+    private boolean shouldAimAtPoint = false;
     private int ballsShot = 0;
-    private final DigitalInput beamBreak;
 
     private double prevTimestamp = 0.0;
     private double deltaTime = 0.02;
@@ -53,10 +53,10 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     private BallSimulator ballSimulator = new BallSimulator(new BallConstants(
             Grams.of(210).in(Kilograms), Inches.of(3).in(Meters), 1.2, 0.30, 1.2, 0.35, 9.81, 20),
             FieldConstants.FIELD_LENGTH, FieldConstants.FIELD_WIDTH);
-    public Translation2d aimAtPoint = Translation2d.kZero;
+    private Translation2d aimAtPoint = Translation2d.kZero;
 
-    public final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("otf_calculator");
-    public final StructArrayPublisher<Pose3d> goalAimPosition = networkTable
+    private final NetworkTable networkTable = NetworkTableInstance.getDefault().getTable("otf_calculator");
+    private final StructArrayPublisher<Pose3d> goalAimPosition = networkTable
             .getStructArrayTopic("aim_at_points", Pose3d.struct)
             .publish();
 
