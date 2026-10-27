@@ -5,14 +5,13 @@ import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.MidtakeConstants;
+import frc.robot.subsystems.impl.MechanicalSubsystem;
 
-public class MidtakeSubsystem extends SubsystemBase {
+public class MidtakeSubsystem extends MechanicalSubsystem {
     private final SparkMax hopper;
     private final NetworkTable networkTables = NetworkTableInstance.getDefault().getTable("midtake");
 
@@ -37,5 +36,10 @@ public class MidtakeSubsystem extends SubsystemBase {
 
     public void setMidtakeSpeed(double speed) {
         hopper.set(speed);
+    }
+
+    @Override
+    public void resetPosition() {
+        setMidtakeSpeed(0);
     }
 }

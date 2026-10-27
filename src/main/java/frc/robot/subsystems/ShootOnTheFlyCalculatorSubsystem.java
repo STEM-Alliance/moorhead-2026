@@ -26,7 +26,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     private ChassisSpeeds prevSpeeds = new ChassisSpeeds();
     private ChassisAccelerations accel = new ChassisAccelerations(0, 0, 0);
     private boolean wasBeamBreakBroken = false;
-    private boolean shouldAimAtPoint = false;
+    private boolean shouldAimAtShuttlePoints = false;
     private int ballsShot = 0;
 
     private double prevTimestamp = 0.0;
@@ -75,7 +75,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         networkTable.putValue("is_aligned", NetworkTableValue.makeBoolean(isAngleWithinTolerance()));
         networkTable.putValue("balls_shot", NetworkTableValue.makeInteger(ballsShot));
         networkTable.putValue("beambreak_broken", NetworkTableValue.makeBoolean(isBeamBroken()));
-        networkTable.putValue("should_aim_at_point", NetworkTableValue.makeBoolean(shouldAimAtPoint));
+        networkTable.putValue("should_aim_at_point", NetworkTableValue.makeBoolean(shouldAimAtShuttlePoints));
 
         otfSolutionPublisher.set(effectiveTargetLocation);
 
@@ -126,7 +126,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
 
         Pose2d currentPose = drivetrain.getPose2d();
 
-        if (!shouldAimAtPoint) {
+        if (!shouldAimAtShuttlePoints) {
             effectiveTargetLocation = ShootOnTheFlyCalculator.calculateEffectiveTargetLocation(
                     currentPose,
                     goal, speeds, accel,
@@ -145,7 +145,7 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
                     5, 0);
         }
 
-        if (currentPose.getX() - goal.getX() < 0 && !shouldAimAtPoint) {
+        if (currentPose.getX() - goal.getX() < 0 && !shouldAimAtShuttlePoints) {
             effectiveTargetLocation = rotate180(effectiveTargetLocation);
         }
 
@@ -166,23 +166,27 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
         return shotSolution;
     }
 
-    public void aimAtShuttlePoint(boolean aimAtShuttlePoint) {
-        this.shouldAimAtPoint = aimAtShuttlePoint;
+    public void aimAtShuttlePoint() {
+        shouldAimAtShuttlePoints = true;
+    }
+
+    public void resetAimPoint() {
+        shouldAimAtShuttlePoints = false;
     }
 
     public Rotation2d getAimAngle() {
         Pose2d targetPose;
 
         /*
-         * This controlls wheather the robot should be aiming at
+         * This controls whether the robot should be aiming at
          * the closest point on our current side in order to auto shuttle
          * 
          * or aim at the hub to score
          */
 
-        if (shouldAimAtPoint) {
+        if (shouldAimAtShuttlePoints) {
             Translation2d currentTransform = drivetrain.getPose2d().getTranslation();
-            Translation2d aimAt = Translation2d.kZero;
+            Translation2d aimAtPoint = Translation2d.kZero;
             Translation2d[] aimAtPoints = FieldConstants.getFieldPoints();
 
             if (aimAtPoints.length > 1) {
@@ -195,20 +199,18 @@ public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
                 double distanceB = currentTransform.getSquaredDistance(aimAtPoints[1]);
 
                 if (distanceA < distanceB) {
-                    aimAt = aimAtPoints[0];
+                    aimAtPoint = aimAtPoints[0];
                 } else {
-                    aimAt = aimAtPoints[1];
+                    aimAtPoint = aimAtPoints[1];
                 }
             }
 
-            aimAtPoint = aimAt;
-            targetPose = new Pose2d(aimAtPoint.getX(), aimAt.getY(), new Rotation2d());
+            this.aimAtPoint = aimAtPoint;
+            targetPose = new Pose2d(this.aimAtPoint.getX(), aimAtPoint.getY(), new Rotation2d());
+        } else if (isOTFSolution()) {
+            targetPose = getOTFSolution().toPose2d();
         } else {
-            if (isOTFSolution()) {
-                targetPose = getOTFSolution().toPose2d();
-            } else {
-                targetPose = FieldConstants.getHubPosition().toPose2d();
-            }
+            targetPose = FieldConstants.getHubPosition().toPose2d();
         }
 
         Pose2d robotPose = drivetrain.getPose2d();

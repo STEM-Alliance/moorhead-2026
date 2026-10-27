@@ -30,7 +30,6 @@ import frc.robot.util.Telemetry;
 import frc.robot.util.TunerConstants;
 import frc.robot.util.VisionCamera;
 
-import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -79,21 +78,21 @@ public class RobotContainer {
                     DriveConstants.ROTATION_CONTROLLER.getD());
 
     public RobotContainer() {
-        // PhotonCameraContainer.addPhotonCamera(
-        //                 new VisionCamera.Builder().withName("FRCamera")
-        //                                 .withCameraDisabled()
-        //                                 .withOffset(
-        //                                                 new Transform3d(
-        //                                                                 Units.inchesToMeters(-10),
-        //                                                                 Units.inchesToMeters(10),
-        //                                                                 Units.inchesToMeters(7),
-        //                                                                 new Rotation3d(
-        //                                                                                 0,
-        //                                                                                 Units.degreesToRadians(
-        //                                                                                                 25),
-        //                                                                                 Units.degreesToRadians(
-        //                                                                                                 35))))
-        //                                 .build());
+        PhotonCameraContainer.addPhotonCamera(
+                new VisionCamera.Builder().withName("FRCamera")
+                        .withCameraDisabled()
+                        .withOffset(
+                                new Transform3d(
+                                        Units.inchesToMeters(-10),
+                                        Units.inchesToMeters(10),
+                                        Units.inchesToMeters(7),
+                                        new Rotation3d(
+                                                0,
+                                                Units.degreesToRadians(
+                                                        25),
+                                                Units.degreesToRadians(
+                                                        35))))
+                        .build());
 
         PhotonCameraContainer.addPhotonCamera(
                 new VisionCamera.Builder().withName("FLcamera")
@@ -126,8 +125,8 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Startup", new InstantCommand(() -> {
             intakeSubsystem.setIntakeSpeed(IntakeConstants.INTAKE_SPEED);
-            midtakeSubsystem.setMidtakeSpeed(0);
-            kickerSubsystem.setKickerSpeed(0);
+            midtakeSubsystem.resetPosition();
+            kickerSubsystem.resetPosition();
             shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
             drivetrain.setDefaultCommand(null);
@@ -158,8 +157,8 @@ public class RobotContainer {
                 }),
                 new WaitCommand(4),
                 new InstantCommand(() -> {
-                    kickerSubsystem.setKickerSpeed(0);
-                    midtakeSubsystem.setMidtakeSpeed(0);
+                    kickerSubsystem.resetPosition();
+                    midtakeSubsystem.resetPosition();
                     shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
                     shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                     intakeSubsystem.setShake(false);
@@ -176,8 +175,8 @@ public class RobotContainer {
                 new ShootCommand(shooter, otfSubsystem)).withDeadline(new WaitCommand(4)));
 
         NamedCommands.registerCommand("Stop Shoot", new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(0);
-            kickerSubsystem.setKickerSpeed(0);
+            midtakeSubsystem.resetPosition();
+            kickerSubsystem.resetPosition();
             shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
         }));
@@ -194,7 +193,7 @@ public class RobotContainer {
 
         NamedCommands.registerCommand("Intake In", new InstantCommand(() -> {
             intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
-            intakeSubsystem.setIntakeSpeed(0);
+            intakeSubsystem.resetPosition();
         }));
 
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -248,57 +247,35 @@ public class RobotContainer {
                         drivetrain.applyRequest(getAimRequest()),
                         new RepeatCommand(new SequentialCommandGroup(
                                 new InstantCommand(() -> {
-                                    midtakeSubsystem.setMidtakeSpeed(
-                                            0);
-                                    kickerSubsystem.setKickerSpeed(
-                                            KickerConstants.KICKER_SPEED);
+                                    midtakeSubsystem.resetPosition();
+                                    kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                                     intakeSubsystem.setShake(true);
                                 }),
-                                new ShootCommand(
-                                        shooter,
-                                        otfSubsystem),
-                                new InstantCommand(
-                                        () -> {
-                                            midtakeSubsystem.setMidtakeSpeed(
-                                                    MidtakeConstants.MIDTAKE_SPEED);
-
-                                        }),
-                                new WaitUntilCommand(new BooleanSupplier() {
-                                    @Override
-                                    public boolean getAsBoolean() {
-                                        return otfSubsystem.getWasBeamBroken();
-                                    }
-                                })))))
+                                new ShootCommand(shooter, otfSubsystem),
+                                new InstantCommand(() -> midtakeSubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED)),
+                                new WaitUntilCommand(otfSubsystem::getWasBeamBroken)))))
                 .onFalse(new InstantCommand(() -> {
                     drivetrain.applyRequest(getDefaultDriveCommand());
-                    midtakeSubsystem.setMidtakeSpeed(0);
-                    kickerSubsystem.setKickerSpeed(0);
+                    midtakeSubsystem.resetPosition();
+                    kickerSubsystem.resetPosition();
                     shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
                     shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                     intakeSubsystem.setShake(false);
                 }));
 
         driveController.leftBumper()
-                .onTrue(new InstantCommand(() -> {
-                    otfSubsystem.aimAtShuttlePoint(true);
-                }))
-                .onFalse(new InstantCommand(() -> {
-                    otfSubsystem.aimAtShuttlePoint(false);
-                }));
+                .onTrue(new InstantCommand(otfSubsystem::aimAtShuttlePoint))
+                .onFalse(new InstantCommand(otfSubsystem::resetAimPoint));
 
         // ---------- Operator Controller ---------- \\
 
         // D:Pad Up | Intake Position -> Stowed
 
-        operatorController.pov(0).onTrue(new InstantCommand(() -> {
-            intakeSubsystem.setIntakePosition(IntakePosition.STOWED);
-        }));
+        operatorController.pov(0).onTrue(new InstantCommand(intakeSubsystem::setIntakeStowed));
 
         // D:Pad Down | Intake Position -> Deployed
 
-        operatorController.pov(180).onTrue(new InstantCommand(() -> {
-            intakeSubsystem.setIntakePosition(IntakePosition.DEPLOYED);
-        }));
+        operatorController.pov(180).onTrue(new InstantCommand(intakeSubsystem::deployIntake));
 
         // Right Bumper | Intake
 
@@ -307,24 +284,20 @@ public class RobotContainer {
             ledSubsystem.setLEDStyle(LedStyle.INTAKE);
         })).onFalse(new InstantCommand(() -> {
             ledSubsystem.setLEDStyle(LedStyle.DEFAULT);
-            intakeSubsystem.setIntakeSpeed(0);
+            intakeSubsystem.resetPosition();
         }));
 
         // Button 8 | Midtake Only
 
-        operatorController.button(8).onTrue(new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-        })).onFalse(new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(0);
-        }));
+        operatorController.button(8)
+                .onTrue(new InstantCommand(() -> midtakeSubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED)))
+                .onFalse(new InstantCommand(() -> midtakeSubsystem.setMidtakeSpeed(0)));
 
         // Button B | Reverse Midtake
 
-        operatorController.b().onTrue(new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
-        })).onFalse(new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(0);
-        }));
+        operatorController.b()
+                .onTrue(new InstantCommand(() -> midtakeSubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED)))
+                .onFalse(new InstantCommand(() -> midtakeSubsystem.setMidtakeSpeed(0)));
 
         // Button A | Reverse Intake + Reverse Midtake
 
@@ -332,8 +305,8 @@ public class RobotContainer {
             intakeSubsystem.setIntakeSpeed(-IntakeConstants.INTAKE_SPEED);
             midtakeSubsystem.setMidtakeSpeed(-MidtakeConstants.MIDTAKE_SPEED);
         })).onFalse(new InstantCommand(() -> {
-            midtakeSubsystem.setMidtakeSpeed(0);
-            intakeSubsystem.setIntakeSpeed(0);
+            midtakeSubsystem.resetPosition();
+            intakeSubsystem.resetPosition();
         }));
 
         operatorController.leftBumper().onTrue(new InstantCommand(() -> {
@@ -343,8 +316,8 @@ public class RobotContainer {
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 5);
             intakeSubsystem.setShake(true);
         })).onFalse(new InstantCommand(() -> {
-            kickerSubsystem.setKickerSpeed(0);
-            midtakeSubsystem.setMidtakeSpeed(0);
+            kickerSubsystem.resetPosition();
+            midtakeSubsystem.resetPosition();
             shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
             intakeSubsystem.setShake(false);
@@ -357,8 +330,8 @@ public class RobotContainer {
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 25);
             intakeSubsystem.setShake(true);
         })).onFalse(new InstantCommand(() -> {
-            kickerSubsystem.setKickerSpeed(0);
-            midtakeSubsystem.setMidtakeSpeed(0);
+            kickerSubsystem.resetPosition();
+            midtakeSubsystem.resetPosition();
             shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
             shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
             intakeSubsystem.setShake(false);
@@ -368,8 +341,7 @@ public class RobotContainer {
                 new WaitUntilCommand(() -> {
                     shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
                     shooter.getHoodMotor().setVoltage(-1);
-                    SmartDashboard.putNumber("hood_current",
-                            shooter.getHoodMotor().getOutputCurrent());
+                    SmartDashboard.putNumber("hood_current", shooter.getHoodMotor().getOutputCurrent());
                     return Math.abs(shooter.getHoodMotor().getOutputCurrent()) > 22;
                 }),
                 new InstantCommand(() -> {
@@ -381,7 +353,6 @@ public class RobotContainer {
 
         RobotModeTriggers.disabled().whileTrue(drivetrain.applyRequest(() -> idle).ignoringDisable(true));
         drivetrain.registerTelemetry(logger::telemeterize);
-
     }
 
     /**
@@ -414,8 +385,8 @@ public class RobotContainer {
     }
 
     public void onTeleOP() {
-        midtakeSubsystem.setMidtakeSpeed(0);
-        kickerSubsystem.setKickerSpeed(0);
+        midtakeSubsystem.resetPosition();
+        kickerSubsystem.resetPosition();
         shooter.setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE);
         drivetrain.setDefaultCommand(drivetrain.applyRequest(getDefaultDriveCommand()));

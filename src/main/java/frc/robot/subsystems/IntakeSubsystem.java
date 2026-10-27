@@ -9,13 +9,18 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.subsystems.impl.MechanicalSubsystem;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeSubsystem extends MechanicalSubsystem {
     private final TalonFX intake;
     private final SparkMax intakePivot;
     private boolean waveIntake = false;
+
+    @Override
+    public void resetPosition() {
+        setIntakeSpeed(0);
+    }
 
     public enum IntakePosition {
         STOWED(IntakeConstants.PIVOT_MIN),
@@ -39,19 +44,6 @@ public class IntakeSubsystem extends SubsystemBase {
                 .apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast)
                         .withInverted(IntakeConstants.INTAKE_REVERSED ? InvertedValue.Clockwise_Positive
                                 : InvertedValue.CounterClockwise_Positive));
-
-        // intakeConfig.inverted(IntakeConstants.INTAKE_REVERSED);
-
-        // intake.configure(intakeConfig, ResetMode.kResetSafeParameters,
-        // PersistMode.kPersistParameters);
-
-        // SparkMaxConfig intakePivotConfig = new SparkMaxConfig();
-        // intakeConfig.inverted(IntakeConstants.INTAKE_PIVOT_REVERSED);
-        // intakePivotConfig.encoder.positionConversionFactor(IntakeConstants.INTAKE_PIVOT_RATIO);
-
-        // intakePivot.configure(intakePivotConfig, ResetMode.kResetSafeParameters,
-        // PersistMode.kPersistParameters);
-
     }
 
     @Override
@@ -61,8 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
         networkTable.putValue("intake_goal_position", NetworkTableValue.makeDouble(position.angle));
         networkTable.putValue("intake_position", NetworkTableValue.makeDouble(intakePivot.getEncoder().getPosition()));
         networkTable.putValue("intake_pivot_output", NetworkTableValue.makeDouble(intakePivot.get()));
-        networkTable.putValue("intake_pivot_velocity",
-                NetworkTableValue.makeDouble(intakePivot.getEncoder().getVelocity()));
+        networkTable.putValue("intake_pivot_velocity", NetworkTableValue.makeDouble(intakePivot.getEncoder().getVelocity()));
 
         double armTarget = position.angle;
 
@@ -88,6 +79,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setIntakePosition(IntakePosition position) {
         this.position = position;
+    }
+
+    public void setIntakeStowed() {
+        setIntakePosition(IntakePosition.STOWED);
+    }
+
+    public void deployIntake() {
+        setIntakePosition(IntakePosition.DEPLOYED);
     }
 
     public double getIntakePosition() {

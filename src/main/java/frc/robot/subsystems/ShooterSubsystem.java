@@ -16,10 +16,10 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.impl.MechanicalSubsystem;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends MechanicalSubsystem {
     private final SparkFlex shooterLeader;
     private final SparkFlex shooterFollower;
     private final SparkMax hoodMotor;
@@ -122,4 +122,8 @@ public class ShooterSubsystem extends SubsystemBase {
         return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 100;
     }
 
+    @Override
+    public void resetPosition() {
+        setShooterRPM(ShooterConstants.SHOOTER_IDLE_RPM);
+    }
 }

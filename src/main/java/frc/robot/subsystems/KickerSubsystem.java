@@ -8,10 +8,10 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.KickerConstants;
+import frc.robot.subsystems.impl.MechanicalSubsystem;
 
-public class KickerSubsystem extends SubsystemBase {
+public class KickerSubsystem extends MechanicalSubsystem {
     private final SparkFlex kicker;
     private final NetworkTable networkTables = NetworkTableInstance.getDefault().getTable("kicker");
 
@@ -36,5 +36,10 @@ public class KickerSubsystem extends SubsystemBase {
 
     public void setKickerSpeed(double speed) {
         kicker.set(speed);
+    }
+
+    @Override
+    public void resetPosition() {
+        setKickerSpeed(0);
     }
 }
