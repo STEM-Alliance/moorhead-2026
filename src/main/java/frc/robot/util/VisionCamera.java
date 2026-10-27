@@ -1,8 +1,7 @@
 package frc.robot.util;
 
-import org.photonvision.PhotonCamera;
-
 import edu.wpi.first.math.geometry.Transform3d;
+import org.photonvision.PhotonCamera;
 
 public class VisionCamera {
     private PhotonCamera camera;

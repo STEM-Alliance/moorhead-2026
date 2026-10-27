@@ -15,7 +15,7 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX intake;
     private final SparkMax intakePivot;
-    private boolean waveMidtake = false;
+    private boolean waveIntake = false;
 
     public enum IntakePosition {
         STOWED(IntakeConstants.PIVOT_MIN),
@@ -23,7 +23,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
         private double angle;
 
-        private IntakePosition(double angle) {
+        IntakePosition(double angle) {
             this.angle = angle;
         }
     }
@@ -65,13 +65,10 @@ public class IntakeSubsystem extends SubsystemBase {
                 NetworkTableValue.makeDouble(intakePivot.getEncoder().getVelocity()));
 
         double armTarget = position.angle;
-        // double ff =
-        // IntakeConstants.PIVOT_FEEDFORWARD.calculate(Units.degreesToRadians(armTarget),
-        // 0.0);
-        double intakeShakeWave = Math.sin(System.currentTimeMillis() * IntakeConstants.SHAKE_FREQUENCY)
-                * IntakeConstants.SHAKE_AMPLITUDE; // -5 -> 5 | Time * Speed | Period - 1 second
-        double outputPosition = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(),
-                                armTarget + (waveMidtake ? intakeShakeWave : 0));
+
+        // -5 -> 5 | Time * Speed | Period - 1 second
+        double intakeShakeWave = Math.sin(System.currentTimeMillis() * IntakeConstants.SHAKE_FREQUENCY) * IntakeConstants.SHAKE_AMPLITUDE;
+        double outputPosition = IntakeConstants.PIVOT_CONTROLLER.calculate(getIntakePosition(), armTarget + (waveIntake ? intakeShakeWave : 0));
 
         intakePivot.set(outputPosition / IntakeConstants.GEAR_RATIO);
 
@@ -82,7 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setShake(boolean shake) {
-        this.waveMidtake = shake;
+        this.waveIntake = shake;
     }
 
     public double getIntakeSpeed() {

@@ -1,39 +1,22 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Grams;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.NetworkTableValue;
-import edu.wpi.first.networktables.StructArrayPublisher;
-import edu.wpi.first.networktables.StructPublisher;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.LEDSubsystem.LedStyle;
-import frc.robot.util.BallConstants;
-import frc.robot.util.BallPhysics;
-import frc.robot.util.BallSimulator;
-import frc.robot.util.BallState;
-import frc.robot.util.ChassisAccelerations;
-import frc.robot.util.ShootOnTheFlyCalculator;
+import frc.robot.util.*;
 import frc.robot.util.BallPhysics.ShotSolution;
+
+import static edu.wpi.first.units.Units.*;
 
 public class ShootOnTheFlyCalculatorSubsystem extends SubsystemBase {
     private final CommandSwerveDrivetrain drivetrain;

@@ -1,23 +1,17 @@
 package frc.robot.subsystems;
 
-import java.awt.Color;
-import java.text.DecimalFormat;
-
-import com.pathplanner.lib.config.RobotConfig;
-
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Elastic;
 import frc.robot.util.Elastic.Notification;
 import frc.robot.util.Elastic.Notification.NotificationLevel;
+
+import java.text.DecimalFormat;
 
 public class ElasticSubsystem extends SubsystemBase {
     private final NetworkTable networkTables = NetworkTableInstance.getDefault().getTable("elastic_game");
@@ -57,7 +51,7 @@ public class ElasticSubsystem extends SubsystemBase {
             switchTeam(null);
         }
 
-        if (gameMessage.length() != 0 && !teamStateUpdated) {
+        if (!gameMessage.isEmpty() && !teamStateUpdated) {
             switch (gameMessage.charAt(0)) {
                 case 'R' -> switchTeam(Alliance.Red);
                 case 'B' -> switchTeam(Alliance.Blue);
