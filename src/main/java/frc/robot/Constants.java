@@ -162,7 +162,7 @@ public final class Constants {
     }
     public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_ANGLE = new InterpolatingDoubleTreeMap();
     public static final double INCOMMING_SHOT_ANGLE = -50;
-    public static final double AIM_TOLERANCE = 3d; // 3degrees
+    public static final double AIM_TOLERANCE = 5d; // 3degrees
 
     public static class ShotRegressionCoefficients {
       public static double linear(double velocity) {
@@ -176,8 +176,8 @@ public final class Constants {
       public static double cubic(double velocity) {
         return (((0.00150004 * (velocity * velocity * velocity))
             - (0.0347092 * (velocity * velocity))
-            + (0.577971 * velocity)
-            - 0.392866) * 1000d) + 400;
+            + (0.587971 * velocity)
+            - 0.392866) * 1000d) + 330;
       }
     }
   }

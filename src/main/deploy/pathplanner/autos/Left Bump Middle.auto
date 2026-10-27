@@ -49,12 +49,6 @@
         {
           "type": "named",
           "data": {
-            "name": "Find Camera"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "Intake In"
           }
         },

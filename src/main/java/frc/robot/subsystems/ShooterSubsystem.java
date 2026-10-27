@@ -121,7 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public boolean isReadyToShoot() {
-        return Math.abs(getHoodAngle() - targetHoodAngle) < 3 && Math.abs(getShooterRPM() - targetRPM) < 100;
+        return Math.abs(getShooterRPM() - targetRPM) < 500;
     }
 
 }

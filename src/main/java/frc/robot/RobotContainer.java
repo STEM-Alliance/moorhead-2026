@@ -373,7 +373,7 @@ public class RobotContainer {
                 operatorController.leftBumper().onTrue(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(5500);
+                        shooter.setShooterRPM(3750);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 5);
                         intakeSubsystem.setShake(true);
                 })).onFalse(new InstantCommand(() -> {
@@ -387,7 +387,7 @@ public class RobotContainer {
                 operatorController.leftTrigger().onTrue(new InstantCommand(() -> {
                         kickerSubsystem.setKickerSpeed(KickerConstants.KICKER_SPEED);
                         MTKESubsystem.setMidtakeSpeed(MidtakeConstants.MIDTAKE_SPEED);
-                        shooter.setShooterRPM(6000);
+                        shooter.setShooterRPM(4000);
                         shooter.setTargetHoodAngle(ShooterConstants.MIN_HOOD_ANGLE + 25);
                         intakeSubsystem.setShake(true);
                 })).onFalse(new InstantCommand(() -> {
